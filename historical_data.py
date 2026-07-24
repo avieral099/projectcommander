@@ -1,10 +1,21 @@
-# Import Required Libraries
-
-from fyers_apiv3 import fyersModel
-from config import APP_ID, ACCESS_TOKEN
 from datetime import datetime
 
-# Create FYERS Object
+from fyers_apiv3 import fyersModel
+
+from config import APP_ID
+
+
+# =====================================================
+# LOAD ACCESS TOKEN
+# =====================================================
+
+with open("access_token.txt", "r") as file:
+    ACCESS_TOKEN = file.read().strip()
+
+
+# =====================================================
+# CREATE FYERS OBJECT
+# =====================================================
 
 fyers = fyersModel.FyersModel(
     client_id=APP_ID,
@@ -12,50 +23,91 @@ fyers = fyersModel.FyersModel(
     is_async=False
 )
 
-# Request Historical Data
+
+# =====================================================
+# REQUEST HISTORICAL DATA
+# =====================================================
 
 data = {
     "symbol": "NSE:NIFTY50-INDEX",
-    "resolution": "5",
+    "resolution": "1",
     "date_format": "1",
     "range_from": "2026-07-01",
     "range_to": "2026-07-21",
     "cont_flag": "1"
 }
 
-# Fetch Historical Data
+
+# =====================================================
+# FETCH HISTORICAL DATA
+# =====================================================
 
 response = fyers.history(data=data)
 
-# Get All Candles
+
+# =====================================================
+# VALIDATE RESPONSE
+# =====================================================
+
+if response.get("s") == "error":
+    print("\nFYERS Historical Data Error")
+    print(response)
+    raise SystemExit(1)
+
+if "candles" not in response:
+    print("\nUnexpected FYERS response")
+    print(response)
+    raise SystemExit(1)
+
+
+# =====================================================
+# GET ALL CANDLES
+# =====================================================
 
 candles = response["candles"]
 
-# Get Latest Candle
+
+if not candles:
+    print("\nNo candle data received.")
+    raise SystemExit(1)
+
+
+# =====================================================
+# GET LATEST CANDLE
+# =====================================================
 
 latest = candles[-1]
 
-# Convert Timestamp to Readable Time
+timestamp = latest[0]
+open_price = latest[1]
+high_price = latest[2]
+low_price = latest[3]
+close_price = latest[4]
+volume = latest[5]
 
-time = datetime.fromtimestamp(latest[0]).strftime("%d-%m-%Y %H:%M:%S")
+time = datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")
 
-# Print Dashboard
 
-print("=" * 45)
-print("        PROJECT COMMANDER")
-print("=" * 45)
+# =====================================================
+# PRINT DASHBOARD
+# =====================================================
 
-print(f"Symbol         : NIFTY50")
-print(f"Time Frame     : 5 Minutes")
-print(f"Total Candles  : {len(candles)}")
+print("\n")
+print("=" * 50)
+print("           PROJECT COMMANDER")
+print("=" * 50)
 
-print("-" * 45)
+print(f"Symbol          : NIFTY50")
+print(f"Time Frame      : 1 Minute")
+print(f"Total Candles   : {len(candles)}")
 
-print(f"Time           : {time}")
-print(f"Open           : {latest[1]}")
-print(f"High           : {latest[2]}")
-print(f"Low            : {latest[3]}")
-print(f"Close          : {latest[4]}")
-print(f"Volume         : {latest[5]}")
+print("-" * 50)
 
-print("=" * 45)
+print(f"Time            : {time}")
+print(f"Open            : {open_price}")
+print(f"High            : {high_price}")
+print(f"Low             : {low_price}")
+print(f"Close           : {close_price}")
+print(f"Volume          : {volume}")
+
+print("=" * 50)
