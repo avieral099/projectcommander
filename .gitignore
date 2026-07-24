@@ -3,6 +3,8 @@ __pycache__/
 
 access_token.txt
 
+config.py
+
 fyersApi.log
 fyersRequests.log
 
