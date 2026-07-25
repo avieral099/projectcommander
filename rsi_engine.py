@@ -1,103 +1,147 @@
-# Import Required Libraries
+import pandas as pd
 
-from market_data import get_historical_data
-
-# Fetch Historical Data
-# Fetch Historical Data
+from historical_data import get_historical_data
 
 
-# RSI Function
+# =====================================================
+# SETTINGS
+# =====================================================
 
-def calculate_rsi(prices, period=14):
+RSI_PERIOD = 14
+DEFAULT_RESOLUTION = "1"
 
-    gains = []
-    losses = []
 
-    for i in range(1, period + 1):
+# =====================================================
+# CALCULATE RSI
+# =====================================================
 
-        change = prices[i] - prices[i - 1]
+def calculate_rsi(
+    symbol,
+    resolution=DEFAULT_RESOLUTION
+):
+    candles = get_historical_data(
+        symbol=symbol,
+        resolution=resolution
+    )
 
-        if change > 0:
-            gains.append(change)
-            losses.append(0)
-        else:
-            gains.append(0)
-            losses.append(abs(change))
+    df = pd.DataFrame(
+        candles,
+        columns=[
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume"
+        ]
+    )
 
-    avg_gain = sum(gains) / period
-    avg_loss = sum(losses) / period
+    df["timestamp"] = (
+        pd.to_datetime(
+            df["timestamp"],
+            unit="s",
+            utc=True
+        )
+        .dt.tz_convert("Asia/Kolkata")
+        .dt.tz_localize(None)
+    )
 
-    for i in range(period + 1, len(prices)):
+    df["close"] = pd.to_numeric(
+        df["close"],
+        errors="coerce"
+    )
 
-        change = prices[i] - prices[i - 1]
+    df.dropna(
+        subset=["close"],
+        inplace=True
+    )
 
-        gain = max(change, 0)
-        loss = abs(min(change, 0))
+    if len(df) < RSI_PERIOD + 1:
+        raise RuntimeError(
+            f"Not enough candles for RSI on {symbol}. "
+            f"Received {len(df)}, minimum required {RSI_PERIOD + 1}."
+        )
 
-        avg_gain = ((avg_gain * (period - 1)) + gain) / period
-        avg_loss = ((avg_loss * (period - 1)) + loss) / period
+    delta = df["close"].diff()
 
-    if avg_loss == 0:
-        return 100
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+
+    # Wilder-style smoothing used for RSI
+    avg_gain = gain.ewm(
+        alpha=1 / RSI_PERIOD,
+        adjust=False,
+        min_periods=RSI_PERIOD
+    ).mean()
+
+    avg_loss = loss.ewm(
+        alpha=1 / RSI_PERIOD,
+        adjust=False,
+        min_periods=RSI_PERIOD
+    ).mean()
 
     rs = avg_gain / avg_loss
 
-    rsi = 100 - (100 / (1 + rs))
+    df["rsi"] = 100 - (100 / (1 + rs))
 
-    return rsi
-symbols = [
-    "NSE:NIFTY50-INDEX",
-    "NSE:NIFTYBANK-INDEX",
-    "BSE:SENSEX-INDEX"
-]
-
-for symbol in symbols:
-
-    candles = get_historical_data(
-        symbol,
-        "5"
+    df.dropna(
+        subset=["rsi"],
+        inplace=True
     )
 
-    close_prices = []
+    if df.empty:
+        raise RuntimeError(
+            f"No valid RSI values generated for {symbol}."
+        )
 
-    for candle in candles:
-        close_prices.append(candle[4])
+    latest = df.iloc[-1]
 
-    rsi = calculate_rsi(close_prices)
+    rsi_value = float(latest["rsi"])
 
-    print("=" * 50)
-    print(symbol)
-    print(f"RSI : {rsi:.2f}")
-
-    if rsi > 70:
-        print("STATUS : OVERBOUGHT 🔴")
-
-    elif rsi < 30:
-        print("STATUS : OVERSOLD 🟢")
-
+    if rsi_value >= 70:
+        state = "OVERBOUGHT"
+    elif rsi_value <= 30:
+        state = "OVERSOLD"
     else:
-        print("STATUS : NEUTRAL 🟡")
+        state = "NEUTRAL"
 
-# Calculate RSI
+    return {
+        "symbol": symbol,
+        "timeframe": resolution,
+        "timestamp": latest["timestamp"],
+        "close": float(latest["close"]),
+        "rsi": rsi_value,
+        "state": state,
+        "total_candles": len(df)
+    }
 
-rsi = calculate_rsi(close_prices)
 
-# Print Dashboard
+# =====================================================
+# TEST
+# =====================================================
 
-print("=" * 50)
-print("        PROJECT COMMANDER")
-print("           RSI ENGINE")
-print("=" * 50)
+if __name__ == "__main__":
 
-print(f"RSI : {rsi:.2f}")
+    TEST_SYMBOL = "NSE:NIFTY50-INDEX"
 
-if rsi > 70:
-    print("STATUS : OVERBOUGHT 🔴")
+    result = calculate_rsi(
+        symbol=TEST_SYMBOL
+    )
 
-elif rsi < 30:
-    print("STATUS : OVERSOLD 🟢")
+    print("\n")
+    print("=" * 55)
+    print("                 RSI ENGINE")
+    print("=" * 55)
 
-else:
-    print("STATUS : NEUTRAL 🟡")
+    print(f"Symbol          : {result['symbol']}")
+    print(f"Time Frame      : {result['timeframe']} Minute")
+    print(f"Total Candles   : {result['total_candles']}")
 
-print("=" * 50)
+    print("-" * 55)
+
+    print(f"Time            : {result['timestamp']}")
+    print(f"Close           : {result['close']:.2f}")
+    print(f"RSI             : {result['rsi']:.2f}")
+    print(f"State           : {result['state']}")
+
+    print("=" * 55)

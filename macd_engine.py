@@ -1,97 +1,157 @@
-# Import Required Libraries
+import pandas as pd
 
-from market_data import get_historical_data
+from historical_data import get_historical_data
 
-# Fetch Historical Data
 
-candles = get_historical_data(
-    "NSE:NIFTY50-INDEX",
-    "5"
-)
+# =====================================================
+# MACD SETTINGS
+# =====================================================
 
-# Extract Closing Prices
+FAST_PERIOD = 12
+SLOW_PERIOD = 26
+SIGNAL_PERIOD = 9
+DEFAULT_RESOLUTION = "1"
 
-close_prices = []
 
-for candle in candles:
-    close_prices.append(candle[4])
+# =====================================================
+# CALCULATE MACD
+# =====================================================
 
-# EMA Function
+def calculate_macd(
+    symbol,
+    resolution=DEFAULT_RESOLUTION
+):
+    candles = get_historical_data(
+        symbol=symbol,
+        resolution=resolution
+    )
 
-def calculate_ema_series(prices, period):
+    df = pd.DataFrame(
+        candles,
+        columns=[
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume"
+        ]
+    )
 
-    multiplier = 2 / (period + 1)
+    df["timestamp"] = (
+        pd.to_datetime(
+            df["timestamp"],
+            unit="s",
+            utc=True
+        )
+        .dt.tz_convert("Asia/Kolkata")
+        .dt.tz_localize(None)
+    )
 
-    ema_values = []
+    for column in [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume"
+    ]:
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce"
+        )
 
-    ema = sum(prices[:period]) / period
+    df.dropna(
+        subset=["close"],
+        inplace=True
+    )
 
-    ema_values.append(ema)
+    minimum_candles = SLOW_PERIOD + SIGNAL_PERIOD
 
-    for price in prices[period:]:
+    if len(df) < minimum_candles:
+        raise RuntimeError(
+            f"Not enough candles for MACD on {symbol}. "
+            f"Received {len(df)}, minimum required {minimum_candles}."
+        )
 
-        ema = ((price - ema) * multiplier) + ema
+    df["ema_fast"] = df["close"].ewm(
+        span=FAST_PERIOD,
+        adjust=False
+    ).mean()
 
-        ema_values.append(ema)
+    df["ema_slow"] = df["close"].ewm(
+        span=SLOW_PERIOD,
+        adjust=False
+    ).mean()
 
-    return ema_values
+    df["macd"] = (
+        df["ema_fast"]
+        - df["ema_slow"]
+    )
 
-# Calculate EMA 12 and EMA 26
+    df["signal_line"] = df["macd"].ewm(
+        span=SIGNAL_PERIOD,
+        adjust=False
+    ).mean()
 
-ema12 = calculate_ema_series(close_prices, 12)
+    df["histogram"] = (
+        df["macd"]
+        - df["signal_line"]
+    )
 
-ema26 = calculate_ema_series(close_prices, 26)
+    latest = df.iloc[-1]
 
-# Match Length
+    macd_value = float(latest["macd"])
+    signal_value = float(latest["signal_line"])
+    histogram_value = float(latest["histogram"])
 
-difference = len(ema12) - len(ema26)
+    if macd_value > signal_value:
+        state = "ABOVE_SIGNAL_LINE"
+    elif macd_value < signal_value:
+        state = "BELOW_SIGNAL_LINE"
+    else:
+        state = "AT_SIGNAL_LINE"
 
-ema12 = ema12[difference:]
+    return {
+        "symbol": symbol,
+        "timeframe": resolution,
+        "timestamp": latest["timestamp"],
+        "close": float(latest["close"]),
+        "macd": macd_value,
+        "signal_line": signal_value,
+        "histogram": histogram_value,
+        "state": state,
+        "total_candles": len(df)
+    }
 
-# MACD Line
 
-macd = []
+# =====================================================
+# TEST
+# =====================================================
 
-for i in range(len(ema26)):
-    macd.append(ema12[i] - ema26[i])
+if __name__ == "__main__":
 
-# Signal Line
+    TEST_SYMBOL = "NSE:NIFTY50-INDEX"
 
-signal = calculate_ema_series(macd, 9)
+    result = calculate_macd(
+        symbol=TEST_SYMBOL
+    )
 
-# Latest Values
+    print("\n")
+    print("=" * 55)
+    print("                 MACD ENGINE")
+    print("=" * 55)
 
-latest_macd = macd[-1]
+    print(f"Symbol          : {result['symbol']}")
+    print(f"Time Frame      : {result['timeframe']} Minute")
+    print(f"Total Candles   : {result['total_candles']}")
 
-latest_signal = signal[-1]
-print("Candles:", len(candles))
-print("First close:",  close_prices[0])
-print("Last close:",   close_prices[-1])
-print("MACD exact:",   repr(latest_macd))
-print("Signal exact:", repr(latest_signal))
+    print("-" * 55)
 
-# Dashboard
+    print(f"Time            : {result['timestamp']}")
+    print(f"Close           : {result['close']:.2f}")
+    print(f"MACD            : {result['macd']:.4f}")
+    print(f"Signal Line     : {result['signal_line']:.4f}")
+    print(f"Histogram       : {result['histogram']:.4f}")
+    print(f"State           : {result['state']}")
 
-print("=" * 55)
-print("      PROJECT COMMANDER")
-print("          MACD ENGINE")
-print("=" * 55)
-
-print(f"MACD        : {latest_macd:.2f}")
-print(f"SIGNAL      : {latest_signal:.2f}")
-
-print("-" * 55)
-
-if latest_macd > latest_signal:
-
-    print("STATUS : BULLISH 🟢")
-
-elif latest_macd < latest_signal:
-
-    print("STATUS : BEARISH 🔴")
-
-else:
-
-    print("STATUS : NEUTRAL 🟡")
-
-print("=" * 55)
+    print("=" * 55)
