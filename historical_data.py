@@ -1,113 +1,186 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from threading import Lock
+from time import monotonic
 
-from fyers_apiv3 import fyersModel
-
-from config import APP_ID
-
-
-# =====================================================
-# LOAD ACCESS TOKEN
-# =====================================================
-
-with open("access_token.txt", "r") as file:
-    ACCESS_TOKEN = file.read().strip()
+from fyers_client import fyers
 
 
-# =====================================================
-# CREATE FYERS OBJECT
-# =====================================================
+# Cache settings
+CACHE_TTL_SECONDS = 60
 
-fyers = fyersModel.FyersModel(
-    client_id=APP_ID,
-    token=ACCESS_TOKEN,
-    is_async=False
-)
+_cache = {}
+_cache_lock = Lock()
 
 
-# =====================================================
-# REQUEST HISTORICAL DATA
-# =====================================================
+def get_date_range(resolution):
+    """
+    Return a suitable dynamic date range for FYERS historical data.
+    """
 
-data = {
-    "symbol": "NSE:NIFTY50-INDEX",
-    "resolution": "1",
-    "date_format": "1",
-    "range_from": "2026-07-01",
-    "range_to": "2026-07-21",
-    "cont_flag": "1"
-}
+    today = datetime.now().date()
+    resolution = str(resolution).upper()
 
+    if resolution == "D":
+        start_date = today - timedelta(days=120)
 
-# =====================================================
-# FETCH HISTORICAL DATA
-# =====================================================
+    elif resolution in {"60", "30", "15"}:
+        start_date = today - timedelta(days=30)
 
-response = fyers.history(data=data)
+    elif resolution in {"10", "5"}:
+        start_date = today - timedelta(days=15)
 
+    else:
+        # 1-minute and other short intraday resolutions
+        start_date = today - timedelta(days=7)
 
-# =====================================================
-# VALIDATE RESPONSE
-# =====================================================
-
-if response.get("s") == "error":
-    print("\nFYERS Historical Data Error")
-    print(response)
-    raise SystemExit(1)
-
-if "candles" not in response:
-    print("\nUnexpected FYERS response")
-    print(response)
-    raise SystemExit(1)
+    return (
+        start_date.strftime("%Y-%m-%d"),
+        today.strftime("%Y-%m-%d"),
+    )
 
 
-# =====================================================
-# GET ALL CANDLES
-# =====================================================
-
-candles = response["candles"]
-
-
-if not candles:
-    print("\nNo candle data received.")
-    raise SystemExit(1)
+def _cache_key(symbol, resolution, range_from, range_to):
+    return (
+        str(symbol),
+        str(resolution),
+        str(range_from),
+        str(range_to),
+    )
 
 
-# =====================================================
-# GET LATEST CANDLE
-# =====================================================
+def clear_historical_cache(symbol=None):
+    """
+    Clear all cached candles or only candles belonging to one symbol.
+    """
 
-latest = candles[-1]
+    with _cache_lock:
+        if symbol is None:
+            _cache.clear()
+            return
 
-timestamp = latest[0]
-open_price = latest[1]
-high_price = latest[2]
-low_price = latest[3]
-close_price = latest[4]
-volume = latest[5]
+        keys_to_remove = [
+            key
+            for key in _cache
+            if key[0] == symbol
+        ]
 
-time = datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")
+        for key in keys_to_remove:
+            _cache.pop(key, None)
 
 
-# =====================================================
-# PRINT DASHBOARD
-# =====================================================
+def get_historical_data(
+    symbol,
+    resolution,
+    range_from=None,
+    range_to=None,
+    force_refresh=False,
+):
+    """
+    Fetch FYERS historical candle data with temporary in-memory caching.
 
-print("\n")
-print("=" * 50)
-print("           PROJECT COMMANDER")
-print("=" * 50)
+    Return format:
+        [
+            [timestamp, open, high, low, close, volume],
+            ...
+        ]
+    """
 
-print(f"Symbol          : NIFTY50")
-print(f"Time Frame      : 1 Minute")
-print(f"Total Candles   : {len(candles)}")
+    if not symbol:
+        raise ValueError("Historical data symbol is required")
 
-print("-" * 50)
+    resolution = str(resolution)
 
-print(f"Time            : {time}")
-print(f"Open            : {open_price}")
-print(f"High            : {high_price}")
-print(f"Low             : {low_price}")
-print(f"Close           : {close_price}")
-print(f"Volume          : {volume}")
+    if range_from is None or range_to is None:
+        dynamic_from, dynamic_to = get_date_range(
+            resolution
+        )
 
-print("=" * 50)
+        range_from = range_from or dynamic_from
+        range_to = range_to or dynamic_to
+
+    key = _cache_key(
+        symbol,
+        resolution,
+        range_from,
+        range_to,
+    )
+
+    now = monotonic()
+
+    if not force_refresh:
+        with _cache_lock:
+            cached = _cache.get(key)
+
+            if cached:
+                age = now - cached["stored_at"]
+
+                if age < CACHE_TTL_SECONDS:
+                    return cached["candles"]
+
+    request_data = {
+        "symbol": symbol,
+        "resolution": resolution,
+        "date_format": "1",
+        "range_from": range_from,
+        "range_to": range_to,
+        "cont_flag": "1",
+    }
+
+    response = fyers.history(
+        data=request_data
+    )
+
+    if not isinstance(response, dict):
+        raise RuntimeError(
+            f"Invalid historical response for "
+            f"{symbol}, resolution {resolution}"
+        )
+
+    if response.get("s") != "ok":
+        message = response.get(
+            "message",
+            response,
+        )
+
+        raise RuntimeError(
+            f"Historical error [{symbol}, "
+            f"{resolution}]: {message}"
+        )
+
+    candles = response.get(
+        "candles",
+        [],
+    )
+
+    if not candles:
+        raise RuntimeError(
+            f"No historical candles received for "
+            f"{symbol}, resolution {resolution}"
+        )
+
+    with _cache_lock:
+        _cache[key] = {
+            "stored_at": now,
+            "candles": candles,
+        }
+
+    return candles
+
+
+def get_cache_status():
+    """
+    Return cache information for debugging.
+    """
+
+    with _cache_lock:
+        return {
+            "entries": len(_cache),
+            "keys": list(_cache.keys()),
+        }
+
+
+if __name__ == "__main__":
+    print(
+        "historical_data.py ready — "
+        "cache enabled"
+    )

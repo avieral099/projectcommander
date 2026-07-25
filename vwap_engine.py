@@ -1,27 +1,28 @@
 import pandas as pd
 
-from market_data import get_historical_data
+from historical_data import get_historical_data
 
 
-# =====================================================
-# SETTINGS
-# =====================================================
-
-DEFAULT_RESOLUTION = "1"
+DEFAULT_RESOLUTION = "5"
 
 
-# =====================================================
-# VWAP ENGINE
-# =====================================================
+def safe_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
-def calculate_vwap(
-    symbol,
-    resolution=DEFAULT_RESOLUTION
-):
+
+def calculate_vwap(symbol, resolution=DEFAULT_RESOLUTION):
     candles = get_historical_data(
         symbol=symbol,
-        resolution=resolution
+        resolution=resolution,
     )
+
+    if not candles:
+        raise RuntimeError(
+            f"No valid candle data available for VWAP on {symbol}"
+        )
 
     df = pd.DataFrame(
         candles,
@@ -31,167 +32,85 @@ def calculate_vwap(
             "high",
             "low",
             "close",
-            "volume"
-        ]
+            "volume",
+        ],
     )
 
-    # Convert timestamp to Indian market time
-    df["timestamp"] = (
-        pd.to_datetime(
-            df["timestamp"],
-            unit="s",
-            utc=True
-        )
-        .dt.tz_convert("Asia/Kolkata")
-        .dt.tz_localize(None)
-    )
+    df["timestamp"] = pd.to_datetime(
+        df["timestamp"],
+        unit="s",
+        utc=True,
+    ).dt.tz_convert("Asia/Kolkata")
 
-    for column in [
-        "high",
-        "low",
-        "close",
-        "volume"
-    ]:
-        df[column] = pd.to_numeric(
-            df[column],
-            errors="coerce"
-        )
+    today = df["timestamp"].dt.date.max()
+    day_df = df[
+        df["timestamp"].dt.date == today
+    ].copy()
 
-    df.dropna(
-        subset=["high", "low", "close", "volume"],
-        inplace=True
-    )
-
-    if df.empty:
+    if day_df.empty:
         raise RuntimeError(
-            f"No valid candle data available for VWAP on {symbol}."
+            f"No current trading-day candles for VWAP on {symbol}"
         )
 
-    # Trading date used to reset VWAP every session
-    df["trading_date"] = df["timestamp"].dt.date
-
-    # Typical Price
-    df["typical_price"] = (
-        df["high"]
-        + df["low"]
-        + df["close"]
+    day_df["typical_price"] = (
+        day_df["high"]
+        + day_df["low"]
+        + day_df["close"]
     ) / 3
 
-    # Typical Price × Volume
-    df["tpv"] = (
-        df["typical_price"]
-        * df["volume"]
+    day_df["price_volume"] = (
+        day_df["typical_price"]
+        * day_df["volume"]
     )
 
-    # Reset cumulative calculations every trading day
-    df["cumulative_tpv"] = (
-        df.groupby("trading_date")["tpv"]
-        .cumsum()
+    total_volume = safe_float(
+        day_df["volume"].sum()
     )
 
-    df["cumulative_volume"] = (
-        df.groupby("trading_date")["volume"]
-        .cumsum()
-    )
-
-    # Avoid division by zero
-    df["vwap"] = (
-        df["cumulative_tpv"]
-        / df["cumulative_volume"].replace(0, pd.NA)
-    )
-
-    df.dropna(
-        subset=["vwap"],
-        inplace=True
-    )
-
-    if df.empty:
-        raise RuntimeError(
-            f"No valid VWAP values generated for {symbol}. "
-            "The instrument may not have usable volume data."
+    if total_volume <= 0:
+        vwap = safe_float(
+            day_df.iloc[-1]["close"]
+        )
+    else:
+        vwap = safe_float(
+            day_df["price_volume"].sum()
+            / total_volume
         )
 
-    latest = df.iloc[-1]
+    latest = day_df.iloc[-1]
+    close_price = safe_float(latest["close"])
 
-    close_price = float(latest["close"])
-    vwap_value = float(latest["vwap"])
+    point_distance = close_price - vwap
 
-    point_distance = close_price - vwap_value
+    percentage_distance = (
+        (point_distance / vwap) * 100
+        if vwap
+        else 0.0
+    )
 
-    if vwap_value != 0:
-        percentage_distance = (
-            point_distance / vwap_value
-        ) * 100
-    else:
-        percentage_distance = 0.0
-
-    if close_price > vwap_value:
+    if close_price > vwap:
         state = "ABOVE_VWAP"
-    elif close_price < vwap_value:
+    elif close_price < vwap:
         state = "BELOW_VWAP"
     else:
         state = "AT_VWAP"
 
     return {
         "symbol": symbol,
-        "timeframe": resolution,
-        "timestamp": latest["timestamp"],
-        "trading_date": latest["trading_date"],
-        "close": close_price,
-        "vwap": vwap_value,
-        "point_distance": round(point_distance, 2),
+        "timeframe": str(resolution),
+        "trading_date": str(today),
+        "timestamp": latest["timestamp"].strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
+        "close": round(close_price, 2),
+        "vwap": round(vwap, 2),
+        "point_distance": round(
+            point_distance,
+            2,
+        ),
         "percentage_distance": round(
             percentage_distance,
-            2
+            2,
         ),
         "state": state,
-        "total_candles": len(df)
     }
-
-
-# =====================================================
-# TEST
-# =====================================================
-
-if __name__ == "__main__":
-
-    TEST_SYMBOL = "NSE:NIFTY50-INDEX"
-
-    try:
-        result = calculate_vwap(
-            symbol=TEST_SYMBOL
-        )
-
-        print("\n")
-        print("=" * 55)
-        print("               VWAP ENGINE")
-        print("=" * 55)
-
-        print(f"Symbol          : {result['symbol']}")
-        print(f"Time Frame      : {result['timeframe']} Minute")
-        print(f"Trading Date    : {result['trading_date']}")
-        print(f"Time            : {result['timestamp']}")
-
-        print("-" * 55)
-
-        print(f"Close           : {result['close']:.2f}")
-        print(f"VWAP            : {result['vwap']:.2f}")
-        print(
-            f"Point Distance  : "
-            f"{result['point_distance']:.2f}"
-        )
-        print(
-            f"Percent Distance: "
-            f"{result['percentage_distance']:.2f}%"
-        )
-        print(f"State           : {result['state']}")
-
-        print("=" * 55)
-
-    except Exception as error:
-        print("\n")
-        print("=" * 55)
-        print("              VWAP ENGINE ERROR")
-        print("=" * 55)
-        print(error)
-        print("=" * 55)

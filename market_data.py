@@ -1,49 +1,74 @@
-from datetime import date
-# Import Required Libraries
+from historical_data import get_historical_data
+from live_cache import (
+    get_live_quote as get_cached_live_quote,
+    get_live_quotes as get_cached_live_quotes,
+)
 
-from fyers_client import fyers
-
-
-# Get Live Quote
 
 def get_live_quote(symbols):
+    """
+    Backward-compatible live quote function.
 
-    data = {
-        "symbols": symbols
-    }
+    Input:
+        Single FYERS symbol
+        OR comma-separated FYERS symbols
 
-    response = fyers.quotes(data=data)
+    Output:
+        Existing project format:
+        [
+            {
+                "n": symbol,
+                "v": quote_values,
+            }
+        ]
+    """
 
-   # print("FYERS RESPONSE :", response)
+    if not symbols:
+        return []
 
-    if "d" in response:
-        return response["d"]
+    symbol_list = [
+        symbol.strip()
+        for symbol in str(symbols).split(",")
+        if symbol.strip()
+    ]
 
-   # print("FYERS ERROR :", response.get("message", response))
+    if not symbol_list:
+        return []
 
-    return []
+    try:
+        if len(symbol_list) == 1:
+            symbol = symbol_list[0]
+            quote = get_cached_live_quote(symbol)
+
+            return [
+                {
+                    "n": symbol,
+                    "v": quote,
+                }
+            ]
+
+        quote_map = get_cached_live_quotes(
+            symbol_list
+        )
+
+        return [
+            {
+                "n": symbol,
+                "v": quote_map[symbol],
+            }
+            for symbol in symbol_list
+            if symbol in quote_map
+        ]
+
+    except Exception as error:
+        print(
+            f"LIVE QUOTE ERROR: {error}"
+        )
+        return []
 
 
-# Get Historical Data
-
-def get_historical_data(symbol, resolution):
-
-    data = {
-        "symbol": symbol,
-        "resolution": resolution,
-        "date_format": "1",
-        "range_from": "2026-07-01",
-        "range_to": date.today().strftime("%Y-%m-%d"),
-        "cont_flag": "1"
-    }
-
-    response = fyers.history(data=data)
-
-   # print("HISTORICAL RESPONSE :", response)
-
-    if "candles" in response:
-        return response["candles"]
-
-    print("HISTORICAL ERROR :", response.get("message", response))
-
-    return []
+if __name__ == "__main__":
+    print(
+        "market_data.py ready — "
+        "live cache connected"
+    )
