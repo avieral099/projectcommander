@@ -1,3 +1,4 @@
+from datetime import date
 # Import Required Libraries
 
 from fyers_client import fyers
@@ -32,7 +33,7 @@ def get_historical_data(symbol, resolution):
         "resolution": resolution,
         "date_format": "1",
         "range_from": "2026-07-01",
-        "range_to": "2026-07-22",
+        "range_to": date.today().strftime("%Y-%m-%d"),
         "cont_flag": "1"
     }
 
