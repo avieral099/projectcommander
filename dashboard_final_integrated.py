@@ -1,14 +1,15 @@
+
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from commander_final_layer import (
+    apply_final_layer,
+    print_final_layer,
+)
 from commander_pipeline import run_pipeline
 from commander_terminal import (
     print_commander_context,
 )
-from commander_summary_panel import (
-    print_commander_summary,
-)
-from trade_lifecycle_panel import print_trade_lifecycle
 from driver_engine import (
     DRIVER_SYMBOLS,
     collect_driver_data,
@@ -61,6 +62,7 @@ def progress_bar(percent, width=28):
             100.0,
         ),
     )
+
     filled = round(
         (percent / 100.0) * width
     )
@@ -96,6 +98,7 @@ def print_subheading(
 
 def get_session_phase():
     controller = SessionController()
+
     current_time = datetime.now(
         IST
     ).strftime("%H:%M")
@@ -392,6 +395,7 @@ def print_market_structure(symbol):
                 symbol
             )
         )
+
     except Exception as error:
         opening_range = {
             "or_high": 0,
@@ -570,6 +574,7 @@ def print_premium_radar(
                 spot_price=spot_price,
             )
         )
+
     except Exception as error:
         print_heading(
             f"PREMIUM RADAR ERROR — "
@@ -649,6 +654,7 @@ def print_driver_radar():
         drivers = (
             collect_driver_data()
         )
+
     except Exception as error:
         print(
             f"DRIVER ENGINE ERROR       : "
@@ -721,6 +727,7 @@ def main():
                 force=True,
             )
         )
+
     except Exception as error:
         print("=" * WIDTH)
         print(
@@ -785,6 +792,7 @@ def main():
                     symbol
                 )
             )
+
         except Exception as error:
             print_heading(
                 f"MARKET STRUCTURE ERROR — "
@@ -800,6 +808,7 @@ def main():
             symbol,
             {},
         )
+
         spot_price = safe_float(
             quote.get("lp")
         )
@@ -821,6 +830,7 @@ def main():
                 symbol
             )
         )
+
         premium_snapshot = (
             premium_snapshots.get(
                 symbol
@@ -864,13 +874,29 @@ def main():
             context
         )
 
-        print_commander_summary(
-            context
-        )
+        try:
+            apply_final_layer(
+                context,
+                market_snapshot=(
+                    market_snapshot
+                ),
+            )
 
-        print_trade_lifecycle(
-            context
-        )
+            print_final_layer(
+                context
+            )
+
+        except Exception as error:
+            context.set_error(
+                "commander_final_layer",
+                error,
+            )
+
+            print_heading(
+                f"FINAL LAYER ERROR — "
+                f"{symbol}"
+            )
+            print(error)
 
     nifty_context = (
         commander_contexts.get(
@@ -887,6 +913,7 @@ def main():
     verdict_status = (
         "NOT AVAILABLE"
     )
+
     final_order = (
         "NO DEPLOYMENT AUTHORISED"
     )
@@ -961,6 +988,16 @@ def main():
             if evidence_result
             else "NOT AVAILABLE"
         ),
+        "REFERENCE LOCK ENGINE": (
+            "ONLINE"
+            if commander_contexts
+            else "NOT AVAILABLE"
+        ),
+        "DECISION ENGINE": (
+            "ONLINE"
+            if commander_contexts
+            else "NOT AVAILABLE"
+        ),
         "PIPELINE ERRORS": (
             pipeline_errors
         ),
@@ -969,10 +1006,10 @@ def main():
             "ONLINE"
         ),
         "09:21 BATTLE REFERENCE": (
-            "AWAITING LIVE MARKET"
+            "AWAITING / LOCKED BY ENGINE"
         ),
         "09:25 STRADDLE REFERENCE": (
-            "AWAITING LIVE MARKET"
+            "AWAITING / LOCKED BY ENGINE"
         ),
         "COMMANDER VERDICT": (
             evidence_result.get(
@@ -1012,15 +1049,6 @@ def main():
         ).center(WIDTH)
     )
     print("=" * WIDTH)
-    return {
-    "generated_at": datetime.now(IST).isoformat(),
-    "phase": locals().get("session_phase", "LIVE"),
-    "market_snapshots": locals().get("market_snapshots", {}),
-    "premium_snapshots": locals().get("premium_snapshots", {}),
-    "drivers": locals().get("drivers", {}),
-    "commander_contexts": locals().get("commander_contexts", {}),
-    "system_statuses": locals().get("system_statuses", {}),
-}
 
 
 if __name__ == "__main__":

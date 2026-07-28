@@ -8,7 +8,6 @@ from commander_terminal import (
 from commander_summary_panel import (
     print_commander_summary,
 )
-from trade_lifecycle_panel import print_trade_lifecycle
 from driver_engine import (
     DRIVER_SYMBOLS,
     collect_driver_data,
@@ -868,10 +867,6 @@ def main():
             context
         )
 
-        print_trade_lifecycle(
-            context
-        )
-
     nifty_context = (
         commander_contexts.get(
             NIFTY_SYMBOL
@@ -1012,15 +1007,6 @@ def main():
         ).center(WIDTH)
     )
     print("=" * WIDTH)
-    return {
-    "generated_at": datetime.now(IST).isoformat(),
-    "phase": locals().get("session_phase", "LIVE"),
-    "market_snapshots": locals().get("market_snapshots", {}),
-    "premium_snapshots": locals().get("premium_snapshots", {}),
-    "drivers": locals().get("drivers", {}),
-    "commander_contexts": locals().get("commander_contexts", {}),
-    "system_statuses": locals().get("system_statuses", {}),
-}
 
 
 if __name__ == "__main__":

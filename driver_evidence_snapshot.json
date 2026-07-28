@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-07-29T01:39:27",
+  "source": "json:market_structure_snapshot.json",
+  "status": "PARTIAL",
+  "driver_side": "UNKNOWN",
+  "driver_score": 50.0,
+  "driver_state": "MIXED",
+  "agreement_pct": 0.0,
+  "participation": {
+    "bull": 0,
+    "bear": 0,
+    "neutral": 2,
+    "total": 2
+  },
+  "leaders": [],
+  "laggards": [],
+  "drivers": [
+    {
+      "name": "BREADTH_5M",
+      "side": "NEUTRAL",
+      "score": 50.0,
+      "change_pct": 0.0,
+      "state": "UNKNOWN"
+    },
+    {
+      "name": "DAILY_WATCH",
+      "side": "NEUTRAL",
+      "score": 50.0,
+      "change_pct": 0.0,
+      "state": "UNKNOWN"
+    }
+  ],
+  "missing_fields": [
+    "driver_side"
+  ],
+  "note": "Driver Evidence Adapter V1 standardises existing driver output. It does not invent missing driver evidence."
+}

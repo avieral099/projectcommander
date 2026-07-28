@@ -9,8 +9,6 @@ CALL = "CALL"
 PUT = "PUT"
 NEUTRAL = "NEUTRAL"
 
-WIDTH = 92
-
 
 EVIDENCE_WEIGHTS = {
     "pdc": 10,
@@ -28,20 +26,6 @@ def safe_float(value, default=0.0):
         return float(value)
     except (TypeError, ValueError):
         return default
-
-
-def progress_bar(percent, width=28):
-    percent = max(0.0, min(safe_float(percent), 100.0))
-    filled = round((percent / 100.0) * width)
-    return "█" * filled + "░" * (width - filled)
-
-
-def direction_marker(side):
-    return {
-        CALL: "▲",
-        PUT: "▼",
-        NEUTRAL: "•",
-    }.get(side, "•")
 
 
 def add_evidence(
@@ -62,6 +46,17 @@ def add_evidence(
 
 
 def score_market_structure(data):
+    """
+    Expected fields:
+        ltp
+        pdc
+        pdh
+        pdl
+        vwap_state
+        ema_structure
+        or_status
+    """
+
     evidence = []
 
     ltp = safe_float(data.get("ltp"))
@@ -69,6 +64,7 @@ def score_market_structure(data):
     pdh = safe_float(data.get("pdh"))
     pdl = safe_float(data.get("pdl"))
 
+    # PDC
     if pdc > 0:
         if ltp > pdc:
             add_evidence(
@@ -95,6 +91,7 @@ def score_market_structure(data):
                 "Price at previous day close",
             )
 
+    # PDH / PDL
     if pdh > 0 and ltp > pdh:
         add_evidence(
             evidence,
@@ -122,6 +119,7 @@ def score_market_structure(data):
             "Price inside previous day range",
         )
 
+    # VWAP
     vwap_state = str(
         data.get("vwap_state", "UNKNOWN")
     ).upper()
@@ -153,6 +151,7 @@ def score_market_structure(data):
             f"VWAP state {vwap_state}",
         )
 
+    # EMA75
     ema_structure = str(
         data.get("ema_structure", "UNKNOWN")
     ).upper()
@@ -184,6 +183,7 @@ def score_market_structure(data):
             f"EMA75 structure {ema_structure}",
         )
 
+    # Opening Range
     or_status = str(
         data.get("or_status", "UNKNOWN")
     ).upper()
@@ -219,6 +219,17 @@ def score_market_structure(data):
 
 
 def score_single_driver(driver):
+    """
+    Driver score:
+        Above PDC       = 15
+        Above PDH       = 20
+        Above VWAP      = 20
+        Above EMA75     = 20
+        Above ORH       = 25
+
+    Bearish side uses opposite conditions.
+    """
+
     if driver.get("error"):
         return {
             "name": driver.get("name", "UNKNOWN"),
@@ -237,6 +248,7 @@ def score_single_driver(driver):
     if driver.get("above_pdc"):
         bull_score += 15
         bull_reasons.append("Above PDC")
+
     elif driver.get("below_pdc"):
         bear_score += 15
         bear_reasons.append("Below PDC")
@@ -244,6 +256,7 @@ def score_single_driver(driver):
     if driver.get("above_pdh"):
         bull_score += 20
         bull_reasons.append("Above PDH")
+
     elif driver.get("below_pdl"):
         bear_score += 20
         bear_reasons.append("Below PDL")
@@ -251,6 +264,7 @@ def score_single_driver(driver):
     if driver.get("above_vwap"):
         bull_score += 20
         bull_reasons.append("Above VWAP")
+
     elif driver.get("below_vwap"):
         bear_score += 20
         bear_reasons.append("Below VWAP")
@@ -258,6 +272,7 @@ def score_single_driver(driver):
     if driver.get("above_ema75_high"):
         bull_score += 20
         bull_reasons.append("Above EMA75 High")
+
     elif driver.get("below_ema75_low"):
         bear_score += 20
         bear_reasons.append("Below EMA75 Low")
@@ -265,6 +280,7 @@ def score_single_driver(driver):
     if driver.get("above_or_high"):
         bull_score += 25
         bull_reasons.append("Above Opening Range High")
+
     elif driver.get("below_or_low"):
         bear_score += 25
         bear_reasons.append("Below Opening Range Low")
@@ -272,9 +288,11 @@ def score_single_driver(driver):
     if bull_score > bear_score:
         state = "BULLISH"
         reasons = bull_reasons
+
     elif bear_score > bull_score:
         state = "BEARISH"
         reasons = bear_reasons
+
     else:
         state = "NEUTRAL"
         reasons = bull_reasons + bear_reasons
@@ -323,12 +341,16 @@ def score_drivers(drivers):
 
     if bull_percent >= 60 and bull_percent > bear_percent:
         state = "STRONG_BULLISH"
+
     elif bull_percent >= 40 and bull_percent > bear_percent:
         state = "BULLISH"
+
     elif bear_percent >= 60 and bear_percent > bull_percent:
         state = "STRONG_BEARISH"
+
     elif bear_percent >= 40 and bear_percent > bull_percent:
         state = "BEARISH"
+
     else:
         state = "MIXED"
 
@@ -344,6 +366,12 @@ def score_premium(
     premium_snapshot,
     battle_reference=None,
 ):
+    """
+    battle_reference absent hone par premium neutral rahega.
+
+    Reference available hone par locked ATM straddle compare hoga.
+    """
+
     current_straddle = safe_float(
         premium_snapshot.get("atm_straddle")
     )
@@ -387,10 +415,12 @@ def score_premium(
         state = "STRADDLE_EXPANSION"
         side = NEUTRAL
         weight = EVIDENCE_WEIGHTS["premium"]
+
     elif change_pct <= -5:
         state = "STRADDLE_DECAY"
         side = NEUTRAL
         weight = EVIDENCE_WEIGHTS["premium"]
+
     else:
         state = "STRADDLE_TIME_PASS"
         side = NEUTRAL
@@ -504,12 +534,16 @@ def build_evidence_matrix(
 
     if call_score >= 60 and call_score > put_score:
         verdict = "CALL_BIAS"
+
     elif put_score >= 60 and put_score > call_score:
         verdict = "PUT_BIAS"
+
     elif call_score > put_score:
         verdict = "WEAK_CALL_BIAS"
+
     elif put_score > call_score:
         verdict = "WEAK_PUT_BIAS"
+
     else:
         verdict = "NO_BIAS"
 
@@ -527,92 +561,41 @@ def build_evidence_matrix(
 
 
 def print_evidence_matrix(result):
-    print("=" * WIDTH)
-    print("EVIDENCE MATRIX".center(WIDTH))
-    print("=" * WIDTH)
-
-    print(
-        f"{'ENGINE':<20}"
-        f"{'DIR':<5}"
-        f"{'SIDE':<10}"
-        f"{'SCORE':>7}   "
-        f"REASON"
-    )
-    print("-" * WIDTH)
+    print("=" * 80)
+    print("EVIDENCE MATRIX".center(80))
+    print("=" * 80)
 
     for item in result["evidence"]:
-        marker = direction_marker(item["side"])
-
         print(
             f"{item['name']:<20}"
-            f"{marker:<5}"
             f"{item['side']:<10}"
-            f"{item['weight']:>7}   "
+            f"{item['weight']:>5}   "
             f"{item['reason']}"
         )
 
-    print("-" * WIDTH)
+    print("-" * 80)
 
     print(
-        f"CALL FIREPOWER            : "
-        f"{progress_bar(result['call_confidence'])} "
-        f"{result['call_score']:>3}/{result['maximum_score']:<3} "
-        f"{result['call_confidence']:>6.2f}%"
+        f"CALL SCORE               : "
+        f"{result['call_score']} / "
+        f"{result['maximum_score']}"
     )
     print(
-        f"PUT FIREPOWER             : "
-        f"{progress_bar(result['put_confidence'])} "
-        f"{result['put_score']:>3}/{result['maximum_score']:<3} "
-        f"{result['put_confidence']:>6.2f}%"
+        f"PUT SCORE                : "
+        f"{result['put_score']} / "
+        f"{result['maximum_score']}"
     )
     print(
-        f"COMMANDER BIAS            : "
+        f"CALL CONFIDENCE          : "
+        f"{result['call_confidence']:.2f}%"
+    )
+    print(
+        f"PUT CONFIDENCE           : "
+        f"{result['put_confidence']:.2f}%"
+    )
+    print(
+        f"COMMANDER BIAS           : "
         f"{result['verdict']}"
     )
 
-    positive = [
-        item
-        for item in result["evidence"]
-        if (
-            ("CALL" in result["verdict"] and item["side"] == CALL)
-            or
-            ("PUT" in result["verdict"] and item["side"] == PUT)
-        )
-    ]
-
-    friction = [
-        item
-        for item in result["evidence"]
-        if item["side"] == NEUTRAL
-    ]
-
-    print("\n" + " PRIMARY DRIVERS ".center(WIDTH, "-"))
-
-    if positive:
-        for item in sorted(
-            positive,
-            key=lambda row: row["weight"],
-            reverse=True,
-        )[:4]:
-            print(
-                f"✓ {item['name']:<18}"
-                f"+{item['weight']:<4} "
-                f"{item['reason']}"
-            )
-    else:
-        print("• No directional driver is strong enough.")
-
-    print("\n" + " FRICTION / PENDING FACTORS ".center(WIDTH, "-"))
-
-    if friction:
-        for item in friction:
-            prefix = "○" if "REFERENCE" in item["reason"] else "!"
-            print(
-                f"{prefix} {item['name']:<18}"
-                f"     "
-                f"{item['reason']}"
-            )
-    else:
-        print("✓ No material conflict detected.")
-
-    print("=" * WIDTH)
+    print("=" * 80)

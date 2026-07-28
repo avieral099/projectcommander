@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-07-29T00:53:09",
+  "universe": "NIFTY50",
+  "scanned": 49,
+  "total": 49,
+  "bull_score": 59.95,
+  "bear_score": 40.05,
+  "regime": "BULLISH_BIAS",
+  "breadth": "MIXED",
+  "momentum": "BALANCED",
+  "trend": "HEALTHY",
+  "risk": "HIGH",
+  "participation_pct": 57.82,
+  "vwap_pct": 57.14,
+  "pdc_pct": 59.18,
+  "short_term_pct": 60.54,
+  "medium_term_pct": 62.24,
+  "long_term_pct": 63.27,
+  "bullish_stack_pct": 14.29,
+  "bearish_stack_pct": 8.16,
+  "reasons": [
+    "67.3% above EMA5; 57.1% above EMA20.",
+    "57.1% above VWAP; 59.2% above PDC.",
+    "14.3% bullish stacks versus 8.2% bearish stacks.",
+    "42.9% above PDH; 32.7% below PDL."
+  ],
+  "warnings": [
+    "Most stocks remain in transition.",
+    "Meaningful participation below previous-day low.",
+    "Directional EMA-stack conviction is limited."
+  ]
+}

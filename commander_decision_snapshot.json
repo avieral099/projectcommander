@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-07-29T00:53:09",
+  "source_generated_at": "2026-07-29T00:53:09",
+  "universe": "NIFTY50",
+  "scanned": 49,
+  "total": 49,
+  "regime": "BULLISH_BIAS",
+  "confidence": 44.95,
+  "quality": "NO_TRADE",
+  "risk": "HIGH",
+  "market_action": "OBSERVE_ONLY",
+  "directional_side": "BULL",
+  "bull_score": 59.95,
+  "bear_score": 40.05,
+  "breadth": "MIXED",
+  "momentum": "BALANCED",
+  "trend": "HEALTHY",
+  "why": [
+    "Bull structure leads 59.95 versus bear 40.05.",
+    "Breadth is mixed.",
+    "Momentum is balanced and trend is healthy.",
+    "Participation 57.82% | VWAP 57.14% | PDC 59.18%.",
+    "Bull stacks 14.29% versus bear stacks 8.16%."
+  ],
+  "warnings": [
+    "Most stocks remain in transition.",
+    "Meaningful participation below previous-day low.",
+    "Directional EMA-stack conviction is limited."
+  ],
+  "blockers": [
+    "Market-health risk is HIGH.",
+    "Confidence is below 60.",
+    "Observation only until risk falls."
+  ],
+  "execution_allowed": false,
+  "execution_note": "Decision V1 describes market context only. Premium and driver confirmation are not connected yet."
+}

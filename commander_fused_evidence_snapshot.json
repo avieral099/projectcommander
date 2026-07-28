@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-07-29T01:40:06",
+  "universe": "NIFTY50",
+  "market": {
+    "status": "CONNECTED",
+    "side": "BULL",
+    "score": 44.95,
+    "regime": "BULLISH_BIAS",
+    "risk": "HIGH"
+  },
+  "premium": {
+    "status": "CONNECTED",
+    "side": "BULL",
+    "score": 75.0,
+    "state": "MIXED_PREMIUM_REGIME",
+    "reasons": [
+      "premium_flow_side: CALL",
+      "decay_state: FAST_DECAY",
+      "rotation_state: AGGRESSIVE_DOWNWARD_ROTATION",
+      "straddle_structure: DECAY_BREAKDOWN",
+      "commander_state: MIXED_PREMIUM_REGIME"
+    ]
+  },
+  "drivers": {
+    "status": "CONNECTED",
+    "side": "UNKNOWN",
+    "score": 50.0,
+    "state": "MIXED",
+    "reasons": [
+      "driver_side: UNKNOWN",
+      "driver_state: MIXED",
+      "agreement_pct: 0.0",
+      "leaders: []",
+      "laggards: []"
+    ]
+  },
+  "connected": {
+    "market": true,
+    "premium": true,
+    "drivers": true
+  },
+  "missing_evidence": [],
+  "fused_side": "BULL",
+  "agreement_votes": 2,
+  "combined_score": 57.98,
+  "context": "OBSERVE_ONLY_HIGH_RISK",
+  "execution_allowed": false,
+  "blockers": [
+    "Confidence is below 60.",
+    "Market-health risk is HIGH.",
+    "Observation only until risk falls.",
+    "Risk remains HIGH."
+  ],
+  "note": "Evidence Fusion V1 does not place orders. Execution eligibility only means the setup may be reviewed manually."
+}
