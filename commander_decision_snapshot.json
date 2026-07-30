@@ -1,36 +1,35 @@
 {
-  "generated_at": "2026-07-29T00:53:09",
-  "source_generated_at": "2026-07-29T00:53:09",
+  "generated_at": "2026-07-29T15:56:06",
+  "source_generated_at": "2026-07-29T15:56:01",
   "universe": "NIFTY50",
   "scanned": 49,
   "total": 49,
   "regime": "BULLISH_BIAS",
-  "confidence": 44.95,
+  "confidence": 43.84,
   "quality": "NO_TRADE",
-  "risk": "HIGH",
-  "market_action": "OBSERVE_ONLY",
+  "risk": "ELEVATED",
+  "market_action": "WAIT_FOR_CLEAR_STRUCTURE",
   "directional_side": "BULL",
-  "bull_score": 59.95,
-  "bear_score": 40.05,
+  "bull_score": 58.84,
+  "bear_score": 41.16,
   "breadth": "MIXED",
   "momentum": "BALANCED",
-  "trend": "HEALTHY",
+  "trend": "TRANSITION",
   "why": [
-    "Bull structure leads 59.95 versus bear 40.05.",
+    "Bull structure leads 58.84 versus bear 41.16.",
     "Breadth is mixed.",
-    "Momentum is balanced and trend is healthy.",
-    "Participation 57.82% | VWAP 57.14% | PDC 59.18%.",
-    "Bull stacks 14.29% versus bear stacks 8.16%."
+    "Momentum is balanced and trend is transition.",
+    "Participation 58.50% | VWAP 65.31% | PDC 73.47%.",
+    "Bull stacks 10.20% versus bear stacks 4.08%."
   ],
   "warnings": [
     "Most stocks remain in transition.",
-    "Meaningful participation below previous-day low.",
     "Directional EMA-stack conviction is limited."
   ],
   "blockers": [
-    "Market-health risk is HIGH.",
+    "Trend remains in transition.",
     "Confidence is below 60.",
-    "Observation only until risk falls."
+    "No clean directional structure."
   ],
   "execution_allowed": false,
   "execution_note": "Decision V1 describes market context only. Premium and driver confirmation are not connected yet."

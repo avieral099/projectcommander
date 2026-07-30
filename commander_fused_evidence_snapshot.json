@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-29T01:40:06",
+  "generated_at": "2026-07-29T15:56:06",
   "universe": "NIFTY50",
   "market": {
     "status": "CONNECTED",
     "side": "BULL",
-    "score": 44.95,
+    "score": 43.84,
     "regime": "BULLISH_BIAS",
-    "risk": "HIGH"
+    "risk": "ELEVATED"
   },
   "premium": {
     "status": "CONNECTED",
@@ -42,14 +42,13 @@
   "missing_evidence": [],
   "fused_side": "BULL",
   "agreement_votes": 2,
-  "combined_score": 57.98,
-  "context": "OBSERVE_ONLY_HIGH_RISK",
+  "combined_score": 57.54,
+  "context": "NO_CLEAR_SETUP",
   "execution_allowed": false,
   "blockers": [
     "Confidence is below 60.",
-    "Market-health risk is HIGH.",
-    "Observation only until risk falls.",
-    "Risk remains HIGH."
+    "No clean directional structure.",
+    "Trend remains in transition."
   ],
   "note": "Evidence Fusion V1 does not place orders. Execution eligibility only means the setup may be reviewed manually."
 }

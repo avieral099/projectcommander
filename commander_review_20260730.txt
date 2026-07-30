@@ -1,0 +1,199 @@
+====================================================================================================
+                    OPERATION COMMANDER — AUTOMATIC DECISION AUDIT — 2026-07-30                     
+====================================================================================================
+Scoring horizon: 15 minutes
+
+----------------------------------------------------------------------------------------------------
+                                          BSE:SENSEX-INDEX                                          
+----------------------------------------------------------------------------------------------------
+Rows: 110
+Period: 2026-07-30T09:15:00+05:30 -> 2026-07-30T11:04:00+05:30
+Spot: 77638.86 -> 77656.52
+Straddle: 341.85 -> 223.30
+Evidence: WEAK_PUT_BIAS=55, WEAK_CALL_BIAS=55
+Battle:   WAIT=82, HOLD_FIRE=28
+Flow:     CALL=51, PUT=50, BALANCED=9
+Outcome:  WRONG=50, CORRECT=27, NEUTRAL=18, UNSCORED=15
+Observation accuracy: 28.42%
+
+TOP WRONG / MISSED OBSERVATIONS
+2026-07-30T09:23:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -64.09
+2026-07-30T09:24:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -73.44
+2026-07-30T09:25:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -64.22
+2026-07-30T09:26:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -97.30
+2026-07-30T09:27:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -115.53
+2026-07-30T09:28:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -72.23
+2026-07-30T09:29:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -70.34
+2026-07-30T09:30:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -73.89
+2026-07-30T09:31:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -56.66
+2026-07-30T09:33:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -44.36
+2026-07-30T09:58:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -42.95
+2026-07-30T09:59:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -58.37
+2026-07-30T10:00:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -72.03
+2026-07-30T10:01:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -63.40
+2026-07-30T10:02:00+05:30 | WRONG | WEAK_CALL_BIAS 40% | WAIT | Spot -61.42
+
+STATE TRANSITIONS
+2026-07-30T09:16:00+05:30 | premium_flow_side: BALANCED -> CALL; decay_state: TIME_PASS -> BALANCED
+2026-07-30T09:17:00+05:30 | premium_flow_side: CALL -> BALANCED
+2026-07-30T09:18:00+05:30 | premium_flow_side: BALANCED -> CALL; rotation_state: UPWARD_ROTATION -> AGGRESSIVE_UPWARD_ROTATION; decay_state: BALANCED -> SLOW_DECAY
+2026-07-30T09:19:00+05:30 | battle_status: HOLD_FIRE -> WAIT; evidence_verdict: WEAK_PUT_BIAS -> WEAK_CALL_BIAS
+2026-07-30T09:22:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:23:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:24:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:25:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:28:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:29:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:30:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: OPENING_RANGE_NOT_READY -> TRANSITION
+2026-07-30T09:31:00+05:30 | straddle_structure: TRANSITION -> DECAY_BREAKDOWN_UNCONFIRMED; straddle_bias: NEUTRAL -> SHORT_STRADDLE
+2026-07-30T09:32:00+05:30 | premium_flow_side: PUT -> CALL; decay_state: SLOW_DECAY -> FAST_DECAY; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:34:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+2026-07-30T09:35:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:36:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+2026-07-30T09:37:00+05:30 | straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:38:00+05:30 | evidence_verdict: WEAK_CALL_BIAS -> WEAK_PUT_BIAS; premium_flow_side: PUT -> CALL; decay_state: FAST_DECAY -> SLOW_DECAY
+2026-07-30T09:40:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:42:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:43:00+05:30 | battle_status: WAIT -> HOLD_FIRE; premium_flow_side: CALL -> BALANCED
+2026-07-30T09:44:00+05:30 | battle_status: HOLD_FIRE -> WAIT; premium_flow_side: BALANCED -> CALL; straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+2026-07-30T09:45:00+05:30 | battle_status: WAIT -> HOLD_FIRE; premium_flow_side: CALL -> BALANCED; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:46:00+05:30 | battle_status: HOLD_FIRE -> WAIT; premium_flow_side: BALANCED -> PUT
+2026-07-30T09:47:00+05:30 | evidence_verdict: WEAK_PUT_BIAS -> WEAK_CALL_BIAS; premium_flow_side: PUT -> CALL; decay_state: SLOW_DECAY -> FAST_DECAY
+2026-07-30T09:48:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+2026-07-30T09:50:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:51:00+05:30 | straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+2026-07-30T09:52:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:53:00+05:30 | straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+... 61 more transitions
+
+----------------------------------------------------------------------------------------------------
+                                         NSE:NIFTY50-INDEX                                          
+----------------------------------------------------------------------------------------------------
+Rows: 110
+Period: 2026-07-30T09:15:00+05:30 -> 2026-07-30T11:04:00+05:30
+Spot: 24235.45 -> 24260.90
+Straddle: 248.10 -> 224.60
+Evidence: WEAK_CALL_BIAS=102, WEAK_PUT_BIAS=6, CALL_BIAS=2
+Battle:   WAIT=100, HOLD_FIRE=8, ATTACK=2
+Flow:     CALL=51, PUT=50, BALANCED=9
+Outcome:  CORRECT=37, WRONG=34, NEUTRAL=24, UNSCORED=15
+Observation accuracy: 38.95%
+
+TOP WRONG / MISSED OBSERVATIONS
+2026-07-30T09:24:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -13.65
+2026-07-30T09:25:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -13.70
+2026-07-30T09:26:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -22.90
+2026-07-30T09:27:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -25.10
+2026-07-30T09:28:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -19.90
+2026-07-30T09:29:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -20.40
+2026-07-30T09:30:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -18.80
+2026-07-30T09:31:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -17.90
+2026-07-30T09:58:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -29.65
+2026-07-30T09:59:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -26.15
+2026-07-30T10:00:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -33.00
+2026-07-30T10:01:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -26.15
+2026-07-30T10:02:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -18.15
+2026-07-30T10:03:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -13.35
+2026-07-30T10:04:00+05:30 | WRONG | WEAK_CALL_BIAS 55% | WAIT | Spot -27.50
+
+STATE TRANSITIONS
+2026-07-30T09:16:00+05:30 | commander_state: PREMIUM_FROZEN -> MIXED_PREMIUM_REGIME; premium_flow_side: PUT -> CALL; decay_state: TIME_PASS -> BALANCED
+2026-07-30T09:17:00+05:30 | premium_flow_side: CALL -> PUT; rotation_state: NO_ROTATION -> DOWNWARD_ROTATION
+2026-07-30T09:18:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:20:00+05:30 | premium_flow_side: CALL -> BALANCED; decay_state: BALANCED -> TIME_PASS
+2026-07-30T09:21:00+05:30 | premium_flow_side: BALANCED -> CALL; decay_state: TIME_PASS -> BALANCED
+2026-07-30T09:22:00+05:30 | premium_flow_side: CALL -> PUT; decay_state: BALANCED -> TIME_PASS
+2026-07-30T09:23:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:24:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:25:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:27:00+05:30 | rotation_state: DOWNWARD_ROTATION -> AGGRESSIVE_UPWARD_ROTATION; decay_state: TIME_PASS -> BALANCED
+2026-07-30T09:28:00+05:30 | premium_flow_side: CALL -> PUT; rotation_state: AGGRESSIVE_UPWARD_ROTATION -> DOWNWARD_ROTATION; decay_state: BALANCED -> TIME_PASS
+2026-07-30T09:29:00+05:30 | premium_flow_side: PUT -> BALANCED; rotation_state: DOWNWARD_ROTATION -> AGGRESSIVE_UPWARD_ROTATION; decay_state: TIME_PASS -> BALANCED
+2026-07-30T09:30:00+05:30 | premium_flow_side: BALANCED -> CALL; rotation_state: AGGRESSIVE_UPWARD_ROTATION -> DOWNWARD_ROTATION; decay_state: BALANCED -> TIME_PASS; straddle_structure: OPENING_RANGE_NOT_READY -> TRANSITION
+2026-07-30T09:31:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:32:00+05:30 | premium_flow_side: PUT -> CALL; rotation_state: DOWNWARD_ROTATION -> AGGRESSIVE_UPWARD_ROTATION; decay_state: TIME_PASS -> BALANCED; straddle_structure: TRANSITION -> DECAY_BREAKDOWN; straddle_bias: NEUTRAL -> SHORT_STRADDLE
+2026-07-30T09:33:00+05:30 | battle_status: WAIT -> ATTACK; evidence_verdict: WEAK_CALL_BIAS -> CALL_BIAS
+2026-07-30T09:34:00+05:30 | premium_flow_side: CALL -> PUT; rotation_state: AGGRESSIVE_UPWARD_ROTATION -> DOWNWARD_ROTATION; straddle_structure: DECAY_BREAKDOWN -> TRANSITION; straddle_bias: SHORT_STRADDLE -> NEUTRAL
+2026-07-30T09:35:00+05:30 | battle_status: ATTACK -> WAIT; evidence_verdict: CALL_BIAS -> WEAK_CALL_BIAS; premium_flow_side: PUT -> CALL; rotation_state: DOWNWARD_ROTATION -> AGGRESSIVE_UPWARD_ROTATION; straddle_structure: TRANSITION -> DECAY_BREAKDOWN_UNCONFIRMED; straddle_bias: NEUTRAL -> SHORT_STRADDLE
+2026-07-30T09:36:00+05:30 | premium_flow_side: CALL -> PUT; rotation_state: AGGRESSIVE_UPWARD_ROTATION -> DOWNWARD_ROTATION; decay_state: BALANCED -> TIME_PASS; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> TRANSITION; straddle_bias: SHORT_STRADDLE -> NEUTRAL
+2026-07-30T09:37:00+05:30 | decay_state: TIME_PASS -> BALANCED
+2026-07-30T09:39:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:40:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: TRANSITION -> DECAY_BREAKDOWN_UNCONFIRMED; straddle_bias: NEUTRAL -> SHORT_STRADDLE
+2026-07-30T09:41:00+05:30 | straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:42:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+2026-07-30T09:43:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:44:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: DECAY_BREAKDOWN -> TRANSITION; straddle_bias: SHORT_STRADDLE -> NEUTRAL
+2026-07-30T09:45:00+05:30 | battle_status: WAIT -> HOLD_FIRE; premium_flow_side: CALL -> BALANCED; straddle_structure: TRANSITION -> DECAY_BREAKDOWN_UNCONFIRMED; straddle_bias: NEUTRAL -> SHORT_STRADDLE
+2026-07-30T09:46:00+05:30 | battle_status: HOLD_FIRE -> WAIT; premium_flow_side: BALANCED -> PUT
+2026-07-30T09:47:00+05:30 | premium_flow_side: PUT -> CALL; rotation_state: DOWNWARD_ROTATION -> AGGRESSIVE_UPWARD_ROTATION; straddle_structure: DECAY_BREAKDOWN_UNCONFIRMED -> DECAY_BREAKDOWN
+2026-07-30T09:48:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+... 63 more transitions
+
+----------------------------------------------------------------------------------------------------
+                                        NSE:NIFTYBANK-INDEX                                         
+----------------------------------------------------------------------------------------------------
+Rows: 110
+Period: 2026-07-30T09:15:00+05:30 -> 2026-07-30T11:04:00+05:30
+Spot: 57118.35 -> 56898.35
+Straddle: 1645.45 -> 1672.65
+Evidence: WEAK_PUT_BIAS=71, PUT_BIAS=39
+Battle:   HOLD_FIRE=65, WAIT=45
+Flow:     CALL=60, PUT=50
+Outcome:  CORRECT=52, WRONG=25, NEUTRAL=18, UNSCORED=15
+Observation accuracy: 54.74%
+
+TOP WRONG / MISSED OBSERVATIONS
+2026-07-30T09:41:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +61.45
+2026-07-30T09:42:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +79.00
+2026-07-30T09:43:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +74.70
+2026-07-30T09:44:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +58.00
+2026-07-30T09:45:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +92.10
+2026-07-30T09:46:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +97.35
+2026-07-30T10:30:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +64.15
+2026-07-30T10:31:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +70.65
+2026-07-30T10:32:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +79.00
+2026-07-30T10:33:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +99.55
+2026-07-30T10:34:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +106.15
+2026-07-30T10:35:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +92.90
+2026-07-30T10:36:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +91.05
+2026-07-30T10:37:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +75.85
+2026-07-30T10:38:00+05:30 | WRONG | PUT_BIAS 75% | WAIT | Spot +93.65
+
+STATE TRANSITIONS
+2026-07-30T09:16:00+05:30 | commander_state: PREMIUM_FROZEN -> MIXED_PREMIUM_REGIME; rotation_state: NO_ROTATION -> DOWNWARD_ROTATION
+2026-07-30T09:18:00+05:30 | premium_flow_side: PUT -> CALL; rotation_state: DOWNWARD_ROTATION -> AGGRESSIVE_DOWNWARD_ROTATION
+2026-07-30T09:19:00+05:30 | battle_status: HOLD_FIRE -> WAIT
+2026-07-30T09:20:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:21:00+05:30 | battle_status: WAIT -> HOLD_FIRE; premium_flow_side: PUT -> CALL
+2026-07-30T09:22:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:24:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T09:30:00+05:30 | straddle_structure: OPENING_RANGE_NOT_READY -> EXPANSION_BREAKOUT; straddle_bias: NEUTRAL -> LONG_STRADDLE
+2026-07-30T09:31:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:32:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: EXPANSION_BREAKOUT -> TRANSITION; straddle_bias: LONG_STRADDLE -> NEUTRAL
+2026-07-30T09:33:00+05:30 | battle_status: HOLD_FIRE -> WAIT
+2026-07-30T09:34:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:35:00+05:30 | battle_status: WAIT -> HOLD_FIRE; premium_flow_side: PUT -> CALL
+2026-07-30T09:36:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:37:00+05:30 | straddle_structure: TRANSITION -> EXPANSION_BREAKOUT; straddle_bias: NEUTRAL -> LONG_STRADDLE
+2026-07-30T09:38:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: EXPANSION_BREAKOUT -> TRANSITION; straddle_bias: LONG_STRADDLE -> NEUTRAL
+2026-07-30T09:39:00+05:30 | straddle_structure: TRANSITION -> EXPANSION_BREAKOUT; straddle_bias: NEUTRAL -> LONG_STRADDLE
+2026-07-30T09:40:00+05:30 | premium_flow_side: CALL -> PUT; straddle_structure: EXPANSION_BREAKOUT -> TRANSITION; straddle_bias: LONG_STRADDLE -> NEUTRAL
+2026-07-30T09:41:00+05:30 | battle_status: HOLD_FIRE -> WAIT; evidence_verdict: WEAK_PUT_BIAS -> PUT_BIAS
+2026-07-30T09:47:00+05:30 | battle_status: WAIT -> HOLD_FIRE; evidence_verdict: PUT_BIAS -> WEAK_PUT_BIAS; premium_flow_side: PUT -> CALL
+2026-07-30T09:48:00+05:30 | straddle_structure: TRANSITION -> EXPANSION_BREAKOUT; straddle_bias: NEUTRAL -> LONG_STRADDLE
+2026-07-30T09:50:00+05:30 | straddle_structure: EXPANSION_BREAKOUT -> TRANSITION; straddle_bias: LONG_STRADDLE -> NEUTRAL
+2026-07-30T09:52:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T09:54:00+05:30 | premium_flow_side: PUT -> CALL; straddle_structure: TRANSITION -> EXPANSION_BREAKOUT; straddle_bias: NEUTRAL -> LONG_STRADDLE
+2026-07-30T09:56:00+05:30 | straddle_structure: EXPANSION_BREAKOUT -> TRANSITION; straddle_bias: LONG_STRADDLE -> NEUTRAL
+2026-07-30T10:01:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T10:03:00+05:30 | premium_flow_side: PUT -> CALL
+2026-07-30T10:06:00+05:30 | premium_flow_side: CALL -> PUT
+2026-07-30T10:07:00+05:30 | battle_status: HOLD_FIRE -> WAIT; premium_flow_side: PUT -> CALL
+2026-07-30T10:08:00+05:30 | battle_status: WAIT -> HOLD_FIRE; premium_flow_side: CALL -> PUT
+... 27 more transitions
+
+====================================================================================================
+NOTES
+====================================================================================================
+This V1 audits recorded observations against later spot movement.
+It does not reconstruct actual option fills, slippage, brokerage or trade P&L.

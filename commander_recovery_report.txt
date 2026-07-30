@@ -1,0 +1,231 @@
+==========================================================================================
+OPERATION COMMANDER — SESSION RECOVERY REPORT
+==========================================================================================
+Generated: 2026-07-29 23:06:10
+
+SNAPSHOT FILES
+------------------------------------------------------------------------------------------
+commander_state.json                          modified=2026-07-28 15:29:10 size=128145
+  Embedded fields: {'generated_at': '2026-07-28T15:29:10.126577+05:30'}
+market_scanner_config.json                    modified=2026-07-29 00:14:07 size=1204
+driver_evidence_snapshot.json                 modified=2026-07-29 15:56:04 size=804
+  Embedded fields: {'generated_at': '2026-07-29T15:56:04', 'status': 'PARTIAL'}
+commander_decision_snapshot.json              modified=2026-07-29 15:56:06 size=1086
+  Embedded fields: {'generated_at': '2026-07-29T15:56:06'}
+premium_evidence_snapshot.json                modified=2026-07-29 15:56:06 size=1510
+  Embedded fields: {'generated_at': '2026-07-29T15:56:06', 'status': 'CONNECTED'}
+commander_fused_evidence_snapshot.json        modified=2026-07-29 15:56:06 size=1322
+  Embedded fields: {'generated_at': '2026-07-29T15:56:06'}
+market_structure_snapshot.json                modified=2026-07-29 20:38:04 size=85665
+  Embedded fields: {'generated_at': '2026-07-29T20:38:04'}
+market_health_snapshot.json                   modified=2026-07-29 20:44:31 size=787
+  Embedded fields: {'generated_at': '2026-07-29T20:44:31'}
+
+SQLITE DATABASE RECOVERY
+------------------------------------------------------------------------------------------
+
+DATABASE: premium_intelligence_1m.db | modified=2026-07-28 15:29:10
+  intelligence_summaries                   rows=1284
+    timestamp: first=2026-07-26T21:43:00+05:30 | last=2026-07-28T15:29:00+05:30
+  option_minute_bars                       rows=17976
+    timestamp: first=2026-07-26T21:43:00+05:30 | last=2026-07-28T15:29:00+05:30
+  reference_locks                          rows=3
+  session_anchors                          rows=89
+  strike_rotations                         rows=123
+    timestamp: first=2026-07-27T09:15:00+05:30 | last=2026-07-28T15:25:00+05:30
+  strike_straddle_minute_bars              rows=8988
+    timestamp: first=2026-07-26T21:43:00+05:30 | last=2026-07-28T15:29:00+05:30
+  trade_lifecycle_events                   rows=1104
+    timestamp: first=2026-07-28T09:15:00+05:30 | last=2026-07-28T15:29:00+05:30
+
+LOG FILES — LAST RECORDED LINES
+------------------------------------------------------------------------------------------
+
+README_COCKPIT_V1.txt | modified=2026-07-27 20:31:50 | size=681
+     python3 market_watch_terminal.py
+     python3 options_straddle_terminal.py --index 1
+     python3 execution_terminal.py
+  4. Safari: http://127.0.0.1:8765
+  
+  Options index: 1 NIFTY, 2 BANKNIFTY, 3 SENSEX.
+  Edit cockpit_config.py to change cash/index watchlists.
+  Stop backend: ./stop_commander_cockpit.sh
+
+commander_cpu.log | modified=2026-07-28 15:29:10 | size=9622393
+  
+  ============================================================================================
+                                         HOLD YOUR FIRE                                       
+                             THE MARKET HAS NOT EARNED YOUR CAPITAL                           
+  --------------------------------------------------------------------------------------------
+                             OPERATION COMMANDER — READY FOR BATTLE                           
+                               DANGEROUS NAAM. DISCIPLINED KAAM.                              
+  ============================================================================================
+
+README.txt | modified=2026-07-28 20:07:18 | size=1263
+  MARKET    CONNECTED
+  PREMIUM   CONNECTED
+  DRIVERS   CONNECTED or PARTIAL
+  
+  IMPORTANT
+  ---------
+  The adapter does not invent missing drivers.
+  If no usable rows exist, STATUS remains PARTIAL and execution stays locked.
+
+commander_audit_20260728.txt | modified=2026-07-28 20:15:34 | size=195946
+  2026-07-28T15:27:00+05:30|NSE:NIFTY50-INDEX|MIXED_PREMIUM_REGIME|HOLD_FIRE|WEAK_PUT_BIAS|40.0|0.0|40.0|2.0|CALL|DOWNWARD_ROTATION|FAST_DECAY|DECAY_BREAKDOWN|SHORT_STRADDLE
+  2026-07-28T15:27:00+05:30|NSE:NIFTYBANK-INDEX|ROTATION_WITH_EXPANSION|WAIT|PUT_BIAS|75.0|0.0|75.0|4.0|CALL|AGGRESSIVE_DOWNWARD_ROTATION|PREMIUM_EXPANSION|DECAY_BREAKDOWN_UNCONFIRMED|SHORT_STRADDLE
+  2026-07-28T15:28:00+05:30|BSE:SENSEX-INDEX|MIXED_PREMIUM_REGIME|HOLD_FIRE|WEAK_PUT_BIAS|25.0|0.0|25.0|2.0|CALL|DOWNWARD_ROTATION|SLOW_DECAY|DECAY_BREAKDOWN_UNCONFIRMED|SHORT_STRADDLE
+  2026-07-28T15:28:00+05:30|NSE:NIFTY50-INDEX|MIXED_PREMIUM_REGIME|HOLD_FIRE|WEAK_PUT_BIAS|40.0|0.0|40.0|2.0|CALL|DOWNWARD_ROTATION|FAST_DECAY|DECAY_BREAKDOWN|SHORT_STRADDLE
+  2026-07-28T15:28:00+05:30|NSE:NIFTYBANK-INDEX|ROTATION_WITH_EXPANSION|WAIT|PUT_BIAS|75.0|0.0|75.0|4.0|CALL|AGGRESSIVE_DOWNWARD_ROTATION|PREMIUM_EXPANSION|DECAY_BREAKDOWN_UNCONFIRMED|SHORT_STRADDLE
+  2026-07-28T15:29:00+05:30|BSE:SENSEX-INDEX|MIXED_PREMIUM_REGIME|HOLD_FIRE|WEAK_PUT_BIAS|40.0|0.0|40.0|2.0|PUT|DOWNWARD_ROTATION|SLOW_DECAY|DECAY_BREAKDOWN|SHORT_STRADDLE
+  2026-07-28T15:29:00+05:30|NSE:NIFTY50-INDEX|ROTATION_WITH_EXPANSION|HOLD_FIRE|WEAK_PUT_BIAS|40.0|0.0|40.0|2.0|PUT|DOWNWARD_ROTATION|PREMIUM_EXPANSION|DECAY_BREAKDOWN_UNCONFIRMED|SHORT_STRADDLE
+  2026-07-28T15:29:00+05:30|NSE:NIFTYBANK-INDEX|MIXED_PREMIUM_REGIME|HOLD_FIRE|PUT_BIAS|75.0|0.0|75.0|2.0|BALANCED|AGGRESSIVE_DOWNWARD_ROTATION|FAST_DECAY|DECAY_BREAKDOWN|SHORT_STRADDLE
+
+commander_review_20260728.txt | modified=2026-07-28 21:59:17 | size=15572
+  2026-07-28T09:58:00+05:30 | straddle_structure: DECAY_BREAKDOWN -> DECAY_BREAKDOWN_UNCONFIRMED
+  ... 260 more transitions
+  
+  ====================================================================================================
+  NOTES
+  ====================================================================================================
+  This V1 audits recorded observations against later spot movement.
+  It does not reconstruct actual option fills, slippage, brokerage or trade P&L.
+
+commander_review_20260728.csv | modified=2026-07-28 21:59:17 | size=234052
+  2026-07-28T15:22:00+05:30,NSE:NIFTYBANK-INDEX,MIXED_PREMIUM_REGIME,HOLD_FIRE,PUT_BIAS,75.0,0.0,75.0,BALANCED,AGGRESSIVE_DOWNWARD_ROTATION,FAST_DECAY,DECAY_BREAKDOWN,SHORT_STRADDLE,56840.05,16.45,UNSCORED,No future row
+  2026-07-28T15:23:00+05:30,NSE:NIFTYBANK-INDEX,ROTATION_WITH_EXPANSION,WAIT,PUT_BIAS,75.0,0.0,75.0,PUT,AGGRESSIVE_DOWNWARD_ROTATION,PREMIUM_EXPANSION,DECAY_BREAKDOWN_UNCONFIRMED,SHORT_STRADDLE,56835.5,19.0,UNSCORED,No future row
+  2026-07-28T15:24:00+05:30,NSE:NIFTYBANK-INDEX,ROTATION_WITH_EXPANSION,WAIT,PUT_BIAS,75.0,0.0,75.0,PUT,AGGRESSIVE_DOWNWARD_ROTATION,PREMIUM_EXPANSION,DECAY_BREAKDOWN_UNCONFIRMED,SHORT_STRADDLE,56791.75,42.3,UNSCORED,No future row
+  2026-07-28T15:25:00+05:30,NSE:NIFTYBANK-INDEX,MIXED_PREMIUM_REGIME,HOLD_FIRE,PUT_BIAS,75.0,0.0,75.0,BALANCED,AGGRESSIVE_DOWNWARD_ROTATION,FAST_DECAY,DECAY_BREAKDOWN,SHORT_STRADDLE,56724.8,57.4,UNSCORED,No future row
+  2026-07-28T15:26:00+05:30,NSE:NIFTYBANK-INDEX,MIXED_PREMIUM_REGIME,WAIT,PUT_BIAS,75.0,0.0,75.0,CALL,AGGRESSIVE_DOWNWARD_ROTATION,FAST_DECAY,DECAY_BREAKDOWN_UNCONFIRMED,SHORT_STRADDLE,56729.7,57.65,UNSCORED,No future row
+  2026-07-28T15:27:00+05:30,NSE:NIFTYBANK-INDEX,ROTATION_WITH_EXPANSION,WAIT,PUT_BIAS,75.0,0.0,75.0,CALL,AGGRESSIVE_DOWNWARD_ROTATION,PREMIUM_EXPANSION,DECAY_BREAKDOWN_UNCONFIRMED,SHORT_STRADDLE,56726.0,60.6,UNSCORED,No future row
+  2026-07-28T15:28:00+05:30,NSE:NIFTYBANK-INDEX,ROTATION_WITH_EXPANSION,WAIT,PUT_BIAS,75.0,0.0,75.0,CALL,AGGRESSIVE_DOWNWARD_ROTATION,PREMIUM_EXPANSION,DECAY_BREAKDOWN_UNCONFIRMED,SHORT_STRADDLE,56724.6,63.2,UNSCORED,No future row
+  2026-07-28T15:29:00+05:30,NSE:NIFTYBANK-INDEX,MIXED_PREMIUM_REGIME,HOLD_FIRE,PUT_BIAS,75.0,0.0,75.0,BALANCED,AGGRESSIVE_DOWNWARD_ROTATION,FAST_DECAY,DECAY_BREAKDOWN,SHORT_STRADDLE,56734.7,57.2,UNSCORED,No future row
+
+fyersApi.log | modified=2026-07-29 00:12:47 | size=15157
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-300,"message":"Invalid symbol provided","s":"error"}},"timestamp":"2026-07-28 23:06:53,963+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-300,"message":"Invalid symbol provided","s":"error"}},"timestamp":"2026-07-28 23:06:54,512+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-50,"data":{"range_to":"Date range cannot exceed 366 days for 1D, 1W, and 1M resolutions."},"message":"Invalid input","s":"error"}},"timestamp":"2026-07-29 00:01:09,240+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-50,"data":{"range_to":"Date range cannot exceed 366 days for 1D, 1W, and 1M resolutions."},"message":"Invalid input","s":"error"}},"timestamp":"2026-07-29 00:05:17,934+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-50,"data":{"range_to":"Date range cannot exceed 366 days for 1D, 1W, and 1M resolutions."},"message":"Invalid input","s":"error"}},"timestamp":"2026-07-29 00:07:19,029+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-300,"message":"Invalid symbol provided","s":"error"}},"timestamp":"2026-07-29 00:12:46,041+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-300,"message":"Invalid symbol provided","s":"error"}},"timestamp":"2026-07-29 00:12:46,666+0530","service":"FyersAPI"}
+  {"level":"ERROR","location":"[get_call:173] fyersModel","message":{"API":"/history","Error":{"code":-300,"message":"Invalid symbol provided","s":"error"}},"timestamp":"2026-07-29 00:12:47,219+0530","service":"FyersAPI"}
+
+access_token.txt | modified=2026-07-29 20:36:54 | size=661
+  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiZDoxIiwiZDoyIiwieDowIiwieDoxIiwieDoyIl0sImF0X2hhc2giOiJnQUFBQUFCcWFoY09JT3JXWVNyYjBVV2hFV29qWVA1djd5S0JjU3lXSHl5NjEzSUFDZzJuWmhSRGFYTE9aUGFiWG9VVDJOMlE1aEs4Q2RMbXJNanppQTBHRld5d2pOZHpnbDBkc2dQNU5XU3lnVUwyLXdSZjYybz0iLCJkaXNwbGF5X25hbWUiOiIiLCJvbXMiOiJLMSIsImhzbV9rZXkiOiI4YWVkYzNhYmJlMWZlMjUxNTkyNjQ2ZGIxMDE1N2VlMzZhMmI4MGRjNzkwMDg1Mzk0MjI4NDk3NiIsImlzRGRwaUVuYWJsZWQiOiJOIiwiaXNNdGZFbmFibGVkIjoiTiIsImZ5X2lkIjoiRkFDOTUwNjEiLCJhcHBUeXBlIjoyMDAsImV4cCI
+
+fyersRequests.log | modified=2026-07-29 20:38:04 | size=2602263
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:00,521+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:01,082+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:01,656+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:02,211+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:02,782+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:03,344+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:03,919+0530","service":"FyersAPIRequest"}
+  {"level":"DEBUG","location":"[get_call:167] fyersModel","message":{"Status Code":200,"API":"/history"},"timestamp":"2026-07-29 20:38:04,472+0530","service":"FyersAPIRequest"}
+
+==========================================================================================
+END OF PYTHON RECOVERY
+==========================================================================================
+==========================================================================================
+MAC MINI REBOOT / SHUTDOWN HISTORY
+==========================================================================================
+reboot time                                Wed Jul 29 22:55
+reboot time                                Wed Jul 29 20:29
+reboot time                                Wed Jul 29 08:26
+shutdown time                              Wed Jul 29 02:06
+reboot time                                Tue Jul 28 08:56
+shutdown time                              Tue Jul 28 02:52
+reboot time                                Mon Jul 27 20:29
+reboot time                                Mon Jul 27 08:45
+shutdown time                              Mon Jul 27 00:04
+reboot time                                Sun Jul 26 12:57
+shutdown time                              Sun Jul 26 04:20
+reboot time                                Sat Jul 25 16:45
+reboot time                                Sat Jul 25 12:59
+shutdown time                              Sat Jul 25 03:44
+reboot time                                Fri Jul 24 23:58
+
+==========================================================================================
+RECENT POWER / SLEEP / WAKE EVENTS
+==========================================================================================
+2026-07-29 12:00:37 +0530 Assertions          	PID 411(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context627.preventuseridlesleep" 00:02:09  id:0x0x1000088e9 [System: DeclUser kDisp]          
+2026-07-29 12:00:37 +0530 Assertions          	PID 411(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context628.preventuseridledisplaysleep" 00:02:09  id:0x0x5000088ec [System: DeclUser kDisp]          
+2026-07-29 12:00:37 +0530 Assertions          	PID 411(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context628.preventuseridlesleep" 00:02:09  id:0x0x1000088eb [System: DeclUser kDisp]          
+2026-07-29 12:03:13 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008912 [System: DeclUser kDisp]          
+2026-07-29 12:13:35 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008932 [System: DeclUser kDisp]          
+2026-07-29 12:23:57 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x10000894e [System: DeclUser kDisp]          
+2026-07-29 12:27:29 +0530 Assertions          	PID 343(powerd) Created InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008966 [System: DeclUser SRPrevSleep kCPU kDisp]          
+2026-07-29 12:27:29 +0530 Assertions          	PID 343(powerd) Released InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008966 [System: DeclUser kDisp]          
+2026-07-29 12:34:19 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008974 [System: DeclUser kDisp]          
+2026-07-29 12:44:42 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:19  id:0x0x100008994 [System: DeclUser kDisp]          
+2026-07-29 12:55:06 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:20  id:0x0x1000089b9 [System: DeclUser kDisp]          
+2026-07-29 12:57:26 +0530 Assertions          	PID 71526(AddressBookSourceSync) Released PreventUserIdleSystemSleep "Address Book Source Sync" 00:00:30  id:0x0x1000089c9 [System: DeclUser kDisp]          
+2026-07-29 13:05:27 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x1000089e8 [System: DeclUser kDisp]          
+2026-07-29 13:15:49 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008a08 [System: DeclUser kDisp]          
+2026-07-29 13:26:12 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:20  id:0x0x100008a28 [System: DeclUser kDisp]          
+2026-07-29 13:27:29 +0530 Assertions          	PID 343(powerd) Created InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008a3b [System: DeclUser SRPrevSleep kCPU kDisp]          
+2026-07-29 13:27:29 +0530 Assertions          	PID 343(powerd) Released InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008a3b [System: DeclUser kDisp]          
+2026-07-29 13:36:34 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008a49 [System: DeclUser kDisp]          
+2026-07-29 13:46:57 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:20  id:0x0x100008a68 [System: DeclUser kDisp]          
+2026-07-29 13:57:19 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008a84 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 13:57:29 +0530 Assertions          	PID 87457(AddressBookSourceSync) Summary PreventUserIdleSystemSleep "Address Book Source Sync" 00:00:24  id:0x0x100008a86 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 13:57:35 +0530 Assertions          	PID 87457(AddressBookSourceSync) Released PreventUserIdleSystemSleep "Address Book Source Sync" 00:00:30  id:0x0x100008a86 [System: DeclUser kDisp]          
+2026-07-29 14:07:41 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008ab5 [System: DeclUser kDisp]          
+2026-07-29 14:18:03 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008ad7 [System: DeclUser kDisp]          
+2026-07-29 14:27:29 +0530 Assertions          	PID 343(powerd) Created InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008aef [System: DeclUser SRPrevSleep kCPU kDisp]          
+2026-07-29 14:27:29 +0530 Assertions          	PID 343(powerd) Released InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008aef [System: DeclUser kDisp]          
+2026-07-29 14:28:25 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008af2 [System: DeclUser kDisp]          
+2026-07-29 14:38:48 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:20  id:0x0x100008b1e [System: DeclUser kDisp]          
+2026-07-29 14:49:10 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008b41 [System: DeclUser kDisp]          
+2026-07-29 14:57:29 +0530 Assertions          	PID 4156(AddressBookSourceSync) Summary PreventUserIdleSystemSleep "Address Book Source Sync" 00:00:11  id:0x0x100008b5c [System: PrevIdle DeclUser kDisp]          
+2026-07-29 14:57:29 +0530 Assertions          	PID 409(runningboardd) Summary PreventUserIdleSystemSleep "osservice<com.apple.AddressBook.SourceSync(501)>409-4156-15225:com.apple.CFNetwork.StorageDB" 00:00:00  id:0x0x100008b6a [System: PrevIdle DeclUser kDisp]          
+2026-07-29 14:57:48 +0530 Assertions          	PID 4156(AddressBookSourceSync) Released PreventUserIdleSystemSleep "Address Book Source Sync" 00:00:30  id:0x0x100008b5c [System: DeclUser kDisp]          
+2026-07-29 14:59:32 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008b6f [System: DeclUser kDisp]          
+2026-07-29 15:09:55 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008b89 [System: DeclUser kDisp]          
+2026-07-29 15:23:36 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008bb0 [System: DeclUser kDisp]          
+2026-07-29 15:27:29 +0530 Assertions          	PID 343(powerd) Created InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008bc7 [System: DeclUser SRPrevSleep kCPU kDisp]          
+2026-07-29 15:27:29 +0530 Assertions          	PID 343(powerd) Released InternalPreventSleep "Holding in darkwake for up to 20 seconds to query model for inactivity prediction" 00:00:00  id:0x0xd00008bc7 [System: DeclUser kDisp]          
+2026-07-29 15:34:00 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:20  id:0x0x100008bd1 [System: DeclUser kDisp]          
+2026-07-29 15:44:23 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:20  id:0x0x100008bf5 [System: DeclUser kDisp]          
+2026-07-29 15:54:45 +0530 Assertions          	PID 371(apsd) Released NoIdleSleepAssertion "com.apple.apsd-keepalive-push.apple.com-NonCellular" 00:00:18  id:0x0x100008c0e [System: DeclUser kDisp]          
+Sleep/Wakes since boot at 2026-07-29 08:26:39 +0530 :0   Dark Wake Count in this sleep cycle:1
+2026-07-29 20:30:04 +0530 Start               	powerd process is started                                                  	          
+2026-07-29 20:30:40 +0530 Assertions          	PID 812(nfcd) Created SystemIsActive "nfcd[runPostStartupWork]" 00:00:00  id:0x0xc000081fa [System: PrevIdle DeclUser SysAct kDisp]          
+2026-07-29 20:30:41 +0530 Assertions          	PID 812(nfcd) Released SystemIsActive "nfcd[runPostStartupWork]" 00:00:00  id:0x0xc000081fa [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:31:29 +0530 Assertions          	PID 645(Code) Created PreventSystemSleep "Preparing update" 00:00:00  id:0x0x700008234 [System: PrevIdle PrevSleep DeclUser kCPU kDisp]          
+2026-07-29 20:31:29 +0530 Assertions          	PID 645(Code) Released PreventSystemSleep "Preparing update" 00:00:00  id:0x0x700008234 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context190.preventuseridledisplaysleep" 00:01:14  id:0x0x5000082a7 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context190.preventuseridlesleep" 00:01:15  id:0x0x1000082a6 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context191.preventuseridledisplaysleep" 00:01:14  id:0x0x5000082a9 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context191.preventuseridlesleep" 00:01:14  id:0x0x1000082a8 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context192.preventuseridledisplaysleep" 00:01:14  id:0x0x5000082ab [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context192.preventuseridlesleep" 00:01:14  id:0x0x1000082aa [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context193.preventuseridledisplaysleep" 00:01:14  id:0x0x5000082ad [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context193.preventuseridlesleep" 00:01:14  id:0x0x1000082ac [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context194.preventuseridledisplaysleep" 00:01:14  id:0x0x5000082af [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:34 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context194.preventuseridlesleep" 00:01:14  id:0x0x1000082ae [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context196.preventuseridledisplaysleep" 00:01:30  id:0x0x5000082b1 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context196.preventuseridlesleep" 00:01:30  id:0x0x1000082b0 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context197.preventuseridledisplaysleep" 00:01:30  id:0x0x5000082b3 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context197.preventuseridlesleep" 00:01:30  id:0x0x1000082b2 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context198.preventuseridledisplaysleep" 00:01:30  id:0x0x5000082b5 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context198.preventuseridlesleep" 00:01:30  id:0x0x1000082b4 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context199.preventuseridledisplaysleep" 00:01:30  id:0x0x5000082b7 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context199.preventuseridlesleep" 00:01:30  id:0x0x1000082b6 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleDisplaySleep "com.apple.audio.context200.preventuseridledisplaysleep" 00:01:30  id:0x0x5000082b9 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 413(coreaudiod) Released PreventUserIdleSystemSleep "com.apple.audio.context200.preventuseridlesleep" 00:01:30  id:0x0x1000082b8 [System: PrevIdle DeclUser kDisp]          
+2026-07-29 20:35:50 +0530 Assertions          	PID 396(bluetoothd) Released PreventUserIdleSystemSleep "com.apple.BTStack" 00:01:00  id:0x0x1000082cf [System: PrevIdle DeclUser kDisp]          
+Sleep/Wakes since boot at 2026-07-29 20:30:04 +0530 :0   Dark Wake Count in this sleep cycle:1
+2026-07-29 22:56:02 +0530 Start               	powerd process is started                                                  	          
+2026-07-29 22:56:35 +0530 Assertions          	PID 757(nfcd) Created SystemIsActive "nfcd[runPostStartupWork]" 00:00:00  id:0x0xc0000823a [System: PrevIdle DeclUser SysAct kDisp]          
+2026-07-29 22:56:35 +0530 Assertions          	PID 757(nfcd) Released SystemIsActive "nfcd[runPostStartupWork]" 00:00:00  id:0x0xc0000823a [System: PrevIdle DeclUser SysAct kDisp]          
+2026-07-29 22:57:11 +0530 Assertions          	PID 654(Code) Created PreventSystemSleep "Preparing update" 00:00:00  id:0x0x70000824b [System: PrevIdle PrevSleep DeclUser kCPU kDisp]          
+2026-07-29 22:57:11 +0530 Assertions          	PID 654(Code) Released PreventSystemSleep "Preparing update" 00:00:00  id:0x0x70000824b [System: PrevIdle DeclUser kDisp]          
+2026-07-29 22:57:34 +0530 Assertions          	PID 394(bluetoothd) Released PreventUserIdleSystemSleep "com.apple.BTStack" 00:01:20  id:0x0x10000816a [System: PrevIdle DeclUser kDisp]          
+Total Sleep/Wakes since boot at 2026-07-29 22:56:02 +0530 :0
+   PreventUserIdleDisplaySleep    0
+   PreventSystemSleep             0
+   PreventUserIdleSystemSleep     1
+   pid 394(bluetoothd): [0x0000026400018300] 00:00:22 PreventUserIdleSystemSleep named: "com.apple.BTStack"  
+   pid 343(powerd): [0x0000001c0001802c] 00:10:06 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  

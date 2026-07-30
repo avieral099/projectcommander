@@ -9,7 +9,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from decision_engine import generate_decision
+from decision_engine import (
+    DecisionEngineV1,
+    print_decision,
+)
 from reference_lock_engine import (
     DEFAULT_DB_PATH,
     ReferenceLockEngine,
@@ -40,7 +43,14 @@ def apply_final_layer(
             now=timestamp,
         )
 
-    decision = generate_decision(context)
+    decision = DecisionEngineV1().analyse(
+        symbol=context.symbol,
+        evidence=context.evidence,
+        flow=context.flow,
+        structure=context.structure,
+        battle=context.battle,
+        references=references,
+    )
 
     context.references = references
     context.decision = decision
@@ -82,20 +92,7 @@ def print_final_layer(
     )
 
     if decision:
-        print("=" * width)
-        print("COMMANDER DECISION".center(width))
-        print("=" * width)
-        print(f"ACTION       : {decision.action}")
-        print(f"SIDE         : {decision.side}")
-        print(f"CONVICTION   : {decision.conviction:.2f}")
-        print(f"INSTRUMENT   : {decision.instrument}")
-        print(f"STRIKE       : {decision.strike_label}")
-        print(f"ENTRY MODE   : {decision.entry_mode}")
-        print(f"ENTRY        : {decision.entry_reference:.2f}")
-        print(f"STOP LOSS    : {decision.stop_loss:.2f}")
-        print(f"TARGET 1     : {decision.target_1:.2f}")
-        print(f"TARGET 2     : {decision.target_2:.2f}")
-        print(f"TARGET 3     : {decision.target_3:.2f}")
-        print(f"BEHAVIOUR    : {decision.behaviour_state}")
-        print(f"BLOCKERS     : {', '.join(decision.blockers) if decision.blockers else 'NONE'}")
-        print("=" * width)
+        print_decision(
+            decision,
+            width=width,
+        )
