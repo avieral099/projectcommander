@@ -533,6 +533,7 @@ def print_market_structure(symbol):
         "symbol": symbol,
         "name": name,
         "ltp": ltp,
+        "change_pct": change_pct,
         "pdc": pdc,
         "pdh": safe_float(
             levels.get(
@@ -735,7 +736,149 @@ def render_commander_footer(verdict_status, final_order):
     print("=" * WIDTH)
 
 
+
+def render_market_overview(snapshots):
+    print_heading("MARKET STRUCTURE — COMPACT VIEW")
+
+    print(
+        f"{'INDEX':<12}"
+        f"{'LTP':>11}"
+        f"{'CHANGE %':>11}"
+        f"{'VWAP':>18}"
+        f"{'EMA75':>18}"
+        f"{'OPENING RANGE':>20}"
+    )
+    print("-" * WIDTH)
+
+    for symbol, data in snapshots.items():
+        if not data:
+            continue
+
+        name = (
+            symbol.replace("NSE:", "")
+            .replace("BSE:", "")
+            .replace("-INDEX", "")
+        )
+
+        print(
+            f"{name:<12}"
+            f"{safe_float(data.get('ltp')):>11.2f}"
+            f"{safe_float(data.get('change_pct')):>+10.2f}%"
+            f"{str(data.get('vwap_state', 'UNKNOWN')):>18}"
+            f"{str(data.get('ema_structure', 'UNKNOWN')):>18}"
+            f"{str(data.get('or_status', 'UNKNOWN')):>20}"
+        )
+
+
+def render_premium_overview(snapshots):
+    print_heading("PREMIUM RADAR — COMPACT VIEW")
+
+    print(
+        f"{'INDEX':<12}"
+        f"{'SPOT':>12}"
+        f"{'ATM':>10}"
+        f"{'STRADDLE':>14}"
+        f"{'EXPIRY':>16}"
+    )
+    print("-" * WIDTH)
+
+    for symbol, data in snapshots.items():
+        if not data:
+            continue
+
+        name = str(
+            data.get(
+                "index_name",
+                symbol,
+            )
+        )
+
+        print(
+            f"{name:<12}"
+            f"{safe_float(data.get('spot_price')):>12.2f}"
+            f"{str(data.get('atm_strike', 'UNKNOWN')):>10}"
+            f"{safe_float(data.get('atm_straddle')):>13.2f}"
+            f"{str(data.get('expiry_date', 'UNKNOWN')):>16}"
+        )
+
+
+def render_driver_overview(drivers):
+    print_heading("INDEX DRIVER RADAR — COMPACT VIEW")
+
+    print(
+        f"{'DRIVER':<14}"
+        f"{'LTP':>11} "
+        f"{'VWAP':>16} "
+        f"{'EMA75':>27} "
+        f"{'OPENING RANGE':>18}"
+    )
+    print("-" * WIDTH)
+
+    for name, data in drivers.items():
+        if data.get("error"):
+            print(
+                f"{name:<14}"
+                f"{'ERROR':>11}"
+                f"{str(data.get('error')):>60}"
+            )
+            continue
+
+        print(
+            f"{name:<14}"
+            f"{safe_float(data.get('ltp')):>11.2f} "
+            f"{str(data.get('vwap_state', 'UNKNOWN')):>16} "
+            f"{str(data.get('ema_structure', 'UNKNOWN')):>27} "
+            f"{str(data.get('or_status', 'UNKNOWN')):>18}"
+        )
+
+
+def render_pipeline_overview(contexts):
+    print_heading("COMMANDER PIPELINE — COMPACT VIEW")
+
+    print(
+        f"{'INDEX':<12}"
+        f"{'VERDICT':>20}"
+        f"{'CALL %':>10}"
+        f"{'PUT %':>10}"
+        f"{'ACTION':>14}"
+        f"{'SIDE':>10}"
+        f"{'CONVICTION':>14}"
+    )
+    print("-" * WIDTH)
+
+    for symbol, context in contexts.items():
+        evidence = getattr(
+            context,
+            "evidence",
+            {},
+        ) or {}
+
+        decision = getattr(
+            context,
+            "decision",
+            None,
+        )
+
+        name = (
+            symbol.replace("NSE:", "")
+            .replace("BSE:", "")
+            .replace("-INDEX", "")
+        )
+
+        print(
+            f"{name:<12}"
+            f"{str(evidence.get('verdict', 'UNKNOWN')):>20}"
+            f"{safe_float(evidence.get('call_confidence')):>9.2f}%"
+            f"{safe_float(evidence.get('put_confidence')):>9.2f}%"
+            f"{str(getattr(decision, 'action', 'NO_TRADE')):>14}"
+            f"{str(getattr(decision, 'side', 'NONE')):>10}"
+            f"{safe_float(getattr(decision, 'conviction', 0)):>13.2f}"
+        )
+
 def main():
+    import io
+    from contextlib import redirect_stdout
+
     now = datetime.now(IST)
     _, phase = get_session_phase()
 
@@ -775,11 +918,14 @@ def main():
 
     for symbol in INDEX_SYMBOLS:
         try:
-            market_snapshots[symbol] = (
-                print_market_structure(
-                    symbol
+            with redirect_stdout(
+                io.StringIO()
+            ):
+                market_snapshots[symbol] = (
+                    print_market_structure(
+                        symbol
+                    )
                 )
-            )
 
         except Exception as error:
             print_heading(
@@ -801,14 +947,30 @@ def main():
             quote.get("lp")
         )
 
-        premium_snapshots[symbol] = (
-            print_premium_radar(
-                symbol,
-                spot_price,
+        with redirect_stdout(
+            io.StringIO()
+        ):
+            premium_snapshots[symbol] = (
+                print_premium_radar(
+                    symbol,
+                    spot_price,
+                )
             )
-        )
 
-    drivers = print_driver_radar()
+    with redirect_stdout(
+        io.StringIO()
+    ):
+        drivers = print_driver_radar()
+
+    render_market_overview(
+        market_snapshots
+    )
+    render_premium_overview(
+        premium_snapshots
+    )
+    render_driver_overview(
+        drivers
+    )
 
     commander_contexts = {}
 
@@ -858,9 +1020,12 @@ def main():
             symbol
         ] = context
 
-        print_commander_context(
-            context
-        )
+        with redirect_stdout(
+            io.StringIO()
+        ):
+            print_commander_context(
+                context
+            )
 
         try:
             apply_final_layer(
@@ -870,9 +1035,12 @@ def main():
                 ),
             )
 
-            print_final_layer(
-                context
-            )
+            with redirect_stdout(
+                io.StringIO()
+            ):
+                print_final_layer(
+                    context
+                )
 
         except Exception as error:
             context.set_error(
@@ -1007,6 +1175,10 @@ def main():
             else "NOT AVAILABLE"
         ),
     }
+
+    render_pipeline_overview(
+        commander_contexts
+    )
 
     print_system_health(
         system_statuses
