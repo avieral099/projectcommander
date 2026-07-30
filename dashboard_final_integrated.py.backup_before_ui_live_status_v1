@@ -737,80 +737,6 @@ def render_commander_footer(verdict_status, final_order):
 
 
 
-
-def render_live_status_strip(
-    *,
-    cache_status,
-    commander_contexts,
-    evidence_result,
-    pipeline_errors,
-):
-    cache_online = (
-        safe_float(
-            cache_status.get(
-                "entries",
-                0,
-            )
-        ) > 0
-    )
-
-    premium_online = bool(
-        commander_contexts
-    )
-
-    evidence_score = safe_float(
-        evidence_result.get(
-            "score",
-            evidence_result.get(
-                "evidence_score",
-                0,
-            ),
-        )
-        if evidence_result
-        else 0
-    )
-
-    decision_ready = any(
-        getattr(
-            getattr(
-                context,
-                "decision",
-                None,
-            ),
-            "action",
-            "NO_TRADE",
-        )
-        != "NO_TRADE"
-        for context in commander_contexts.values()
-    )
-
-    print("\n" + "=" * WIDTH)
-    print(
-        " | ".join(
-            (
-                "LIVE",
-                (
-                    "CACHE OK"
-                    if cache_online
-                    else "CACHE DOWN"
-                ),
-                (
-                    "PREMIUM OK"
-                    if premium_online
-                    else "PREMIUM DOWN"
-                ),
-                f"EVIDENCE {evidence_score:.0f}%",
-                (
-                    "DECISION READY"
-                    if decision_ready
-                    else "DECISION WAIT"
-                ),
-                f"ERRORS {pipeline_errors}",
-            )
-        ).center(WIDTH)
-    )
-    print("=" * WIDTH)
-
 def render_market_overview(snapshots):
     print_heading("MARKET STRUCTURE — COMPACT VIEW")
 
@@ -1174,13 +1100,6 @@ def main():
         for context in (
             commander_contexts.values()
         )
-    )
-
-    render_live_status_strip(
-        cache_status=cache_status,
-        commander_contexts=commander_contexts,
-        evidence_result=evidence_result,
-        pipeline_errors=pipeline_errors,
     )
 
     system_statuses = {
