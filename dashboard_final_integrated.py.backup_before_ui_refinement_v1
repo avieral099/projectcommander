@@ -707,34 +707,6 @@ def print_driver_radar():
     return drivers
 
 
-
-def print_key_value(label, value, label_width=26):
-    print(f"{label:<{label_width}} : {value}")
-
-
-def render_commander_header(now, phase):
-    print("\n" + "=" * WIDTH)
-    print("OPERATION COMMANDER".center(WIDTH))
-    print("OPTION INTELLIGENCE & PREMIUM BEHAVIOUR TERMINAL".center(WIDTH))
-    print("=" * WIDTH)
-
-    print_key_value("DATE", now.strftime("%Y-%m-%d"))
-    print_key_value("TIME", f"{now.strftime('%H:%M:%S')} IST")
-    print_key_value("SESSION PHASE", phase)
-    print_key_value("MISSION STATUS", get_market_mission_status(phase))
-    print_key_value("09:21 REFERENCE", "ENGINE CONTROLLED")
-    print_key_value("09:25 STRADDLE", "ENGINE CONTROLLED")
-
-
-def render_commander_footer(verdict_status, final_order):
-    print("\n" + "=" * WIDTH)
-    print("COMMANDER SUMMARY".center(WIDTH))
-    print("=" * WIDTH)
-    print_key_value("VERDICT", verdict_status)
-    print_key_value("ORDER", final_order)
-    print("=" * WIDTH)
-
-
 def main():
     now = datetime.now(IST)
     _, phase = get_session_phase()
@@ -765,9 +737,49 @@ def main():
         print(error)
         return
 
-    render_commander_header(
-        now,
-        phase,
+    print("\n" + "=" * WIDTH)
+    print(
+        "OPERATION COMMANDER".center(
+            WIDTH
+        )
+    )
+    print(
+        (
+            "TACTICAL OPTION INTELLIGENCE "
+            "& PREMIUM WAR ROOM"
+        ).center(WIDTH)
+    )
+    print(
+        (
+            "NO HOPE. NO FEAR. "
+            "ONLY EXECUTION."
+        ).center(WIDTH)
+    )
+    print("=" * WIDTH)
+
+    print(
+        f"DATE                      : "
+        f"{now.strftime('%Y-%m-%d')}"
+    )
+    print(
+        f"TIME                      : "
+        f"{now.strftime('%H:%M:%S')} IST"
+    )
+    print(
+        f"SESSION PHASE             : "
+        f"{phase}"
+    )
+    print(
+        f"MISSION STATUS            : "
+        f"{get_market_mission_status(phase)}"
+    )
+    print(
+        "REFERENCE LOCK TIME       : "
+        "09:21"
+    )
+    print(
+        "9:25 STRADDLE STATUS      : "
+        "PENDING LIVE LOCK"
     )
 
     market_snapshots = {}
@@ -1012,10 +1024,31 @@ def main():
         system_statuses
     )
 
-    render_commander_footer(
-        verdict_status,
-        final_order,
+    print("\n" + "=" * WIDTH)
+    print(
+        verdict_status.center(
+            WIDTH
+        )
     )
+    print(
+        final_order.center(
+            WIDTH
+        )
+    )
+    print("-" * WIDTH)
+    print(
+        (
+            "OPERATION COMMANDER — "
+            "READY FOR BATTLE"
+        ).center(WIDTH)
+    )
+    print(
+        (
+            "DANGEROUS NAAM. "
+            "DISCIPLINED KAAM."
+        ).center(WIDTH)
+    )
+    print("=" * WIDTH)
 
 
 if __name__ == "__main__":
