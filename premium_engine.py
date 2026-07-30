@@ -333,6 +333,8 @@ def calculate_straddle_map(
 def calculate_premium_snapshot(
     symbol,
     spot_price=None,
+    fixed_atm=None,
+    fixed_expiry=None,
 ):
     """
     Returns ATM ±3 CE/PE strike ladder.
@@ -349,9 +351,12 @@ def calculate_premium_snapshot(
         spot_price=spot_price,
     )
 
-    atm = safe_int(
-        strikes["atm_strike"]
-    )
+    if fixed_atm is not None:
+        atm = safe_int(fixed_atm)
+    else:
+        atm = safe_int(
+            strikes["atm_strike"]
+        )
 
     response = fetch_option_chain(
         symbol=symbol,
@@ -450,10 +455,13 @@ def calculate_premium_snapshot(
     )
 
     expiry = (
-        expiry_data[0]
+        dict(expiry_data[0])
         if expiry_data
         else {}
     )
+
+    if fixed_expiry:
+        expiry["date"] = fixed_expiry
 
     missing_contracts = [
         label

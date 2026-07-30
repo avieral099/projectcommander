@@ -26,6 +26,7 @@ from opening_range_engine import (
 from premium_engine import (
     calculate_premium_snapshot,
 )
+from premium_intelligence_1m import PremiumIntelligence1M
 from price_levels import get_price_levels
 from session_controller import SessionController
 from vwap_engine import calculate_vwap
@@ -564,6 +565,34 @@ def print_market_structure(symbol):
     }
 
 
+
+def get_reference_lock(
+    symbol,
+    expiry_date,
+):
+    trading_date = datetime.now(
+        IST
+    ).strftime("%Y-%m-%d")
+
+    with PremiumIntelligence1M() as database:
+        straddle_lock = database.reference(
+            trading_date,
+            "STRADDLE_0925",
+            symbol,
+            expiry_date,
+        )
+
+        if straddle_lock:
+            return straddle_lock
+
+        return database.reference(
+            trading_date,
+            "BATTLE_0921",
+            symbol,
+            expiry_date,
+        )
+
+
 def print_premium_radar(
     symbol,
     spot_price,
@@ -575,6 +604,27 @@ def print_premium_radar(
                 spot_price=spot_price,
             )
         )
+
+        lock = get_reference_lock(
+            symbol,
+            snapshot.get(
+                "expiry_date"
+            ),
+        )
+
+        if lock:
+            snapshot = (
+                calculate_premium_snapshot(
+                    symbol,
+                    spot_price=spot_price,
+                    fixed_atm=lock.get(
+                        "atm_strike"
+                    ),
+                    fixed_expiry=lock.get(
+                        "expiry_date"
+                    ),
+                )
+            )
 
     except Exception as error:
         print_heading(
