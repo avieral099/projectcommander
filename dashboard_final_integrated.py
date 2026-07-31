@@ -12,6 +12,9 @@ from commander_pipeline import run_pipeline
 from commander_terminal import (
     print_commander_context,
 )
+from trade_lifecycle_panel import (
+    print_trade_lifecycle,
+)
 from driver_engine import (
     DRIVER_SYMBOLS,
     collect_driver_data,
@@ -1312,6 +1315,18 @@ def main():
     render_pipeline_overview(
         commander_contexts
     )
+
+    for symbol in INDEX_SYMBOLS:
+        context = commander_contexts.get(
+            symbol
+        )
+
+        if not context:
+            continue
+
+        print_trade_lifecycle(
+            context
+        )
 
     print_system_health(
         system_statuses
