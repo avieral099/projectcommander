@@ -9,3 +9,13 @@ fyersApi.log
 fyersRequests.log
 
 .vscode/
+# Commander runtime files
+premium_intelligence_1m.db
+premium_intelligence_1m.db-shm
+premium_intelligence_1m.db-wal
+
+commander_cpu.log
+commander_state.json
+
+*.log
+*.pid
