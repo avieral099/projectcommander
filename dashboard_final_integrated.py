@@ -1,5 +1,7 @@
 
 from datetime import datetime
+import os
+import time
 from zoneinfo import ZoneInfo
 
 from commander_final_layer import (
@@ -1322,4 +1324,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        os.system("clear")
+        main()
+        time.sleep(5)
