@@ -1,18 +1,177 @@
-import argparse,sqlite3,time,os
-from cockpit_config import OPTION_INDEXES,TERMINAL_REFRESH_SECONDS
-DB="premium_intelligence_1m.db"
+import argparse
+import os
+import sqlite3
+import time
+
+from cockpit_config import (
+    OPTION_INDEXES,
+    TERMINAL_REFRESH_SECONDS,
+)
+
+DB = "premium_intelligence_1m.db"
+WIDTH = 100
+
+
+def fetch_index_data(symbol):
+    connection = sqlite3.connect(DB)
+    connection.row_factory = sqlite3.Row
+
+    try:
+        summary = connection.execute(
+            """
+            SELECT *
+            FROM intelligence_summaries
+            WHERE index_symbol=?
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (symbol,),
+        ).fetchone()
+
+        if not summary:
+            return None, [], []
+
+        rows = connection.execute(
+            """
+            SELECT
+                ladder_label,
+                strike,
+                option_type,
+                ltp,
+                bid,
+                ask,
+                oi,
+                volume,
+                iv
+            FROM option_minute_bars
+            WHERE timestamp=?
+              AND index_symbol=?
+            ORDER BY strike, option_type
+            """,
+            (
+                summary["timestamp"],
+                symbol,
+            ),
+        ).fetchall()
+
+        locks = connection.execute(
+            """
+            SELECT
+                reference_type,
+                straddle
+            FROM reference_locks
+            WHERE index_symbol=?
+            ORDER BY lock_time DESC
+            LIMIT 2
+            """,
+            (symbol,),
+        ).fetchall()
+
+        return summary, rows, locks
+
+    finally:
+        connection.close()
+
+
+def print_index(name, symbol):
+    print("=" * WIDTH)
+    print(
+        f"COMMANDER — OPTIONS / STRADDLE — {name}".center(WIDTH)
+    )
+    print("=" * WIDTH)
+
+    try:
+        summary, rows, locks = fetch_index_data(symbol)
+
+        if not summary:
+            print("NO OPTION DATA YET")
+            return
+
+        print(
+            f"TIME {summary['timestamp']} | "
+            f"SPOT {summary['spot_price']:.2f} | "
+            f"ATM {summary['atm_strike']} | "
+            f"STRADDLE ₹{summary['atm_straddle']:.2f}"
+        )
+
+        print(
+            f"DECAY {summary['decay_state']} | "
+            f"ROTATION {summary['rotation_state']} | "
+            f"COMMANDER {summary['commander_state']}"
+        )
+
+        if locks:
+            print(
+                "LOCKS: "
+                + " | ".join(
+                    f"{row['reference_type']} "
+                    f"₹{row['straddle']:.2f}"
+                    for row in locks
+                )
+            )
+        else:
+            print("LOCKS: AWAITING")
+
+        print("-" * WIDTH)
+        print(
+            f"{'LABEL':<11}"
+            f"{'STRIKE':>8}"
+            f"{'TYPE':>6}"
+            f"{'LTP':>10}"
+            f"{'BID':>10}"
+            f"{'ASK':>10}"
+            f"{'OI':>13}"
+            f"{'VOL':>13}"
+            f"{'IV':>8}"
+        )
+        print("-" * WIDTH)
+
+        for row in rows:
+            print(
+                f"{row['ladder_label']:<11}"
+                f"{row['strike']:>8}"
+                f"{row['option_type']:>6}"
+                f"{row['ltp']:>10.2f}"
+                f"{row['bid']:>10.2f}"
+                f"{row['ask']:>10.2f}"
+                f"{row['oi']:>13}"
+                f"{row['volume']:>13}"
+                f"{row['iv']:>8.2f}"
+            )
+
+    except Exception as error:
+        print(f"DB ERROR: {error}")
+
+
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument("--index",choices=["1","2","3"],default="1");a=ap.parse_args();name,symbol=OPTION_INDEXES[a.index]
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--index",
+        choices=["all", "1", "2", "3"],
+        default="all",
+    )
+    args = parser.parse_args()
+
     while True:
-        os.system("clear");print("="*100);print(f"COMMANDER — OPTIONS / STRADDLE — {name}".center(100));print("="*100)
-        try:
-            con=sqlite3.connect(DB);con.row_factory=sqlite3.Row;s=con.execute("SELECT * FROM intelligence_summaries WHERE index_symbol=? ORDER BY timestamp DESC LIMIT 1",(symbol,)).fetchone();rows=[]
-            if s:rows=con.execute("SELECT ladder_label,strike,option_type,ltp,bid,ask,oi,volume,iv FROM option_minute_bars WHERE timestamp=? AND index_symbol=? ORDER BY strike,option_type",(s['timestamp'],symbol)).fetchall()
-            locks=con.execute("SELECT reference_type,straddle FROM reference_locks WHERE index_symbol=? ORDER BY lock_time DESC LIMIT 2",(symbol,)).fetchall();con.close()
-            if not s:print("NO OPTION DATA YET")
-            else:
-                print(f"TIME {s['timestamp']} | SPOT {s['spot_price']:.2f} | ATM {s['atm_strike']} | STRADDLE ₹{s['atm_straddle']:.2f}");print(f"DECAY {s['decay_state']} | ROTATION {s['rotation_state']} | COMMANDER {s['commander_state']}");print("LOCKS: "+" | ".join(f"{r['reference_type']} ₹{r['straddle']:.2f}" for r in locks));print("-"*100);print(f"{'LABEL':<11}{'STRIKE':>8}{'TYPE':>6}{'LTP':>10}{'BID':>10}{'ASK':>10}{'OI':>13}{'VOL':>13}{'IV':>8}")
-                for r in rows:print(f"{r['ladder_label']:<11}{r['strike']:>8}{r['option_type']:>6}{r['ltp']:>10.2f}{r['bid']:>10.2f}{r['ask']:>10.2f}{r['oi']:>13}{r['volume']:>13}{r['iv']:>8.2f}")
-        except Exception as e:print(f"DB ERROR: {e}")
+        os.system("clear")
+
+        if args.index == "all":
+            selected = OPTION_INDEXES.items()
+        else:
+            selected = [
+                (
+                    args.index,
+                    OPTION_INDEXES[args.index],
+                )
+            ]
+
+        for _, index_data in selected:
+            name, symbol = index_data
+            print_index(name, symbol)
+            print()
+
         time.sleep(TERMINAL_REFRESH_SECONDS)
-if __name__=="__main__":main()
+
+
+if __name__ == "__main__":
+    main()
