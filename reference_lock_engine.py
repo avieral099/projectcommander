@@ -262,6 +262,78 @@ class ReferenceLockEngine:
                 "reference": None,
             }
 
+        if current_clock > target_time:
+            target_clock = target_time.strftime("%H:%M")
+
+            row = self.connection.execute(
+                """
+                SELECT
+                    timestamp,
+                    trading_date,
+                    index_symbol,
+                    expiry_date,
+                    spot_price,
+                    atm_strike,
+                    ce_ltp,
+                    pe_ltp,
+                    straddle
+                FROM strike_straddle_minute_bars
+                WHERE trading_date = ?
+                  AND index_symbol = ?
+                  AND substr(timestamp, 12, 5) = ?
+                  AND strike = atm_strike
+                ORDER BY timestamp DESC
+                LIMIT 1
+                """,
+                (
+                    trading_date,
+                    index_symbol,
+                    target_clock,
+                ),
+            ).fetchone()
+
+            if not row:
+                return {
+                    "status": "MISSED_LOCK_NO_SOURCE",
+                    "target_time": target_clock,
+                    "reference": None,
+                }
+
+            recovered = ReferenceLock(
+                trading_date=row["trading_date"],
+                lock_time=target_clock,
+                reference_type=reference_type,
+                index_symbol=row["index_symbol"],
+                expiry_date=row["expiry_date"],
+                atm_strike=safe_int(row["atm_strike"]),
+                spot_price=safe_float(row["spot_price"]),
+                atm_ce=round(safe_float(row["ce_ltp"]), 2),
+                atm_pe=round(safe_float(row["pe_ltp"]), 2),
+                atm_straddle=round(
+                    safe_float(row["straddle"]),
+                    2,
+                ),
+                payload={
+                    "recovered": True,
+                    "source_table": (
+                        "strike_straddle_minute_bars"
+                    ),
+                    "source_timestamp": row["timestamp"],
+                },
+            )
+
+            saved = self.save_lock(
+                recovered,
+                created_at=current.isoformat(
+                    timespec="seconds"
+                ),
+            )
+
+            return {
+                "status": "RECOVERED_LOCK",
+                "reference": saved,
+            }
+
         contracts = premium_snapshot.get("contracts") or {}
         atm_ce_contract = contracts.get("ATM_CE") or {}
         atm_pe_contract = contracts.get("ATM_PE") or {}
