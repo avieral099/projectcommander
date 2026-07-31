@@ -17,6 +17,9 @@ def cycle():
     with log.open("a") as fh,contextlib.redirect_stdout(fh),contextlib.redirect_stderr(fh): state=dashboard.main()
     if not isinstance(state,dict):raise RuntimeError("Run install_cockpit_v1.py first")
     payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist()}
+    payload["timestamp"]=payload.get("generated_at") or now().isoformat()
+    payload["updated_at"]=now().isoformat()
+    payload["age_seconds"]=0
     write_state(STATE_FILE,payload);return payload
 def main():
     ap=argparse.ArgumentParser();ap.add_argument("--once",action="store_true");ap.add_argument("--allow-closed",action="store_true");a=ap.parse_args();print("COMMANDER CPU — SILENT BACKEND")
