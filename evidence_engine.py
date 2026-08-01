@@ -16,8 +16,9 @@ EVIDENCE_WEIGHTS = {
     "pdc": 10,
     "pdh_pdl": 15,
     "vwap": 15,
-    "ema75": 15,
-    "opening_range": 20,
+    "ema75": 10,
+    "supertrend": 10,
+    "opening_range": 15,
     "drivers": 15,
     "premium": 10,
 }
@@ -182,6 +183,37 @@ def score_market_structure(data):
             NEUTRAL,
             0,
             f"EMA75 structure {ema_structure}",
+        )
+
+    supertrend_state = str(
+        data.get("supertrend_state", "UNKNOWN")
+    ).upper()
+
+    if supertrend_state == "BULLISH":
+        add_evidence(
+            evidence,
+            "SUPERTREND",
+            CALL,
+            EVIDENCE_WEIGHTS["supertrend"],
+            "Supertrend bullish",
+        )
+
+    elif supertrend_state == "BEARISH":
+        add_evidence(
+            evidence,
+            "SUPERTREND",
+            PUT,
+            EVIDENCE_WEIGHTS["supertrend"],
+            "Supertrend bearish",
+        )
+
+    else:
+        add_evidence(
+            evidence,
+            "SUPERTREND",
+            NEUTRAL,
+            0,
+            f"Supertrend state {supertrend_state}",
         )
 
     or_status = str(

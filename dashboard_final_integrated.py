@@ -28,6 +28,9 @@ from market_data import get_live_quote
 from opening_range_engine import (
     calculate_opening_range,
 )
+from supertrend_engine import (
+    calculate_supertrend,
+)
 from premium_engine import (
     calculate_premium_snapshot,
 )
@@ -396,6 +399,17 @@ def print_market_structure(symbol):
     )
 
     try:
+        supertrend = calculate_supertrend(
+            symbol=symbol,
+            resolution="5",
+        )
+    except Exception as error:
+        supertrend = {
+            "state": "UNKNOWN",
+            "error": str(error),
+        }
+
+    try:
         opening_range = (
             calculate_opening_range(
                 symbol
@@ -561,6 +575,10 @@ def print_market_structure(symbol):
         ),
         "ema_structure": ema.get(
             "structure_state",
+            "UNKNOWN",
+        ),
+        "supertrend_state": supertrend.get(
+            "state",
             "UNKNOWN",
         ),
         "or_status": opening_range.get(
