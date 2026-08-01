@@ -16,6 +16,7 @@ from premium_intelligence_1m import (
 )
 from straddle_structure_engine import StraddleStructureEngine
 from trade_lifecycle_engine import TradeLifecycleEngine
+from validation_engine import ValidationEngine
 
 
 DEFAULT_DB_PATH = "premium_intelligence_1m.db"
@@ -525,6 +526,18 @@ def run_pipeline(
     except Exception as error:
         context.set_error(
             "trade_lifecycle_engine",
+            error,
+        )
+
+    try:
+        with ValidationEngine(db_path) as validation_engine:
+            context.validation = validation_engine.capture(
+                context,
+                timestamp=timestamp,
+            )
+    except Exception as error:
+        context.set_error(
+            "validation_engine",
             error,
         )
 

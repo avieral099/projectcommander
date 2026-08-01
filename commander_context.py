@@ -14,6 +14,7 @@ class CommanderContext:
     structure: Any = None
     battle: Any = None
     evidence: Optional[Dict[str, Any]] = None
+    validation: Optional[Dict[str, Any]] = None
     errors: Dict[str, str] = field(default_factory=dict)
 
     def set_error(
