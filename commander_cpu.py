@@ -1,5 +1,5 @@
 from __future__ import annotations
-import argparse,contextlib,time,traceback
+import argparse,contextlib,fcntl,os,time,traceback
 from datetime import datetime,time as clock_time
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -9,6 +9,31 @@ from commander_state_store import context_to_dict,serialise,write_state
 from live_cache import refresh_live_cache
 from event_queue import EventQueue
 IST=ZoneInfo("Asia/Kolkata"); MARKET_OPEN=clock_time(9,15); MARKET_CLOSE=clock_time(15,30)
+
+COMMANDER_CPU_LOCK = Path(".commander_cpu.lock")
+
+
+def acquire_singleton_lock():
+    handle = COMMANDER_CPU_LOCK.open("w")
+
+    try:
+        fcntl.flock(
+            handle.fileno(),
+            fcntl.LOCK_EX | fcntl.LOCK_NB,
+        )
+    except BlockingIOError:
+        handle.close()
+        raise RuntimeError(
+            "Commander CPU already running; "
+            "second instance refused"
+        )
+
+    handle.seek(0)
+    handle.truncate()
+    handle.write(str(os.getpid()))
+    handle.flush()
+    return handle
+
 def now():return datetime.now(IST)
 def collect_watchlist():
     symbols=list(dict.fromkeys([*INDEX_WATCHLIST.values(),*CASH_WATCHLIST.values()])); q=refresh_live_cache(symbols,force=True)
@@ -30,6 +55,7 @@ def cycle():
     payload["age_seconds"]=0
     write_state(STATE_FILE,payload);return payload
 def main():
+    lock_handle = acquire_singleton_lock()
     ap=argparse.ArgumentParser();ap.add_argument("--once",action="store_true");ap.add_argument("--allow-closed",action="store_true");a=ap.parse_args();print("COMMANDER CPU — SILENT BACKEND")
     while True:
         t=now();tm=t.time().replace(tzinfo=None)

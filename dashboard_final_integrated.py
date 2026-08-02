@@ -1,6 +1,8 @@
 
+from pathlib import Path
 from datetime import datetime
 import os
+import fcntl
 import time
 from zoneinfo import ZoneInfo
 
@@ -42,6 +44,29 @@ from vwap_engine import calculate_vwap
 
 IST = ZoneInfo("Asia/Kolkata")
 WIDTH = 92
+
+
+DASHBOARD_LOCK = Path(".dashboard.lock")
+
+def acquire_dashboard_lock():
+    handle = DASHBOARD_LOCK.open("w")
+    try:
+        fcntl.flock(
+            handle.fileno(),
+            fcntl.LOCK_EX | fcntl.LOCK_NB,
+        )
+    except BlockingIOError:
+        handle.close()
+        raise RuntimeError(
+            "Dashboard already running; second instance refused"
+        )
+
+    handle.seek(0)
+    handle.truncate()
+    handle.write(str(os.getpid()))
+    handle.flush()
+    return handle
+
 
 INDEX_SYMBOLS = [
     "NSE:NIFTY50-INDEX",
@@ -1357,6 +1382,8 @@ def main():
 
 
 if __name__ == "__main__":
+    dashboard_lock_handle = acquire_dashboard_lock()
+
     while True:
         os.system("clear")
         main()

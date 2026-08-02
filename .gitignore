@@ -19,3 +19,11 @@ commander_state.json
 
 *.log
 *.pid
+
+# Commander runtime locks
+.commander_cpu.lock
+.dashboard.lock
+.chart_server.lock
+.market_watch.lock
+.options_terminal.lock
+.execution_terminal.lock

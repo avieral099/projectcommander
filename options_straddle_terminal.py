@@ -1,3 +1,6 @@
+import fcntl
+import os
+from pathlib import Path
 import argparse
 import os
 import sqlite3
@@ -143,6 +146,33 @@ def print_index(name, symbol):
         print(f"DB ERROR: {error}")
 
 
+
+
+OPTIONS_TERMINAL_LOCK = Path(".options_terminal.lock")
+
+
+def acquire_options_terminal_lock():
+    handle = OPTIONS_TERMINAL_LOCK.open("w")
+
+    try:
+        fcntl.flock(
+            handle.fileno(),
+            fcntl.LOCK_EX | fcntl.LOCK_NB,
+        )
+    except BlockingIOError:
+        handle.close()
+        raise RuntimeError(
+            "Options Terminal already running; "
+            "second instance refused"
+        )
+
+    handle.seek(0)
+    handle.truncate()
+    handle.write(str(os.getpid()))
+    handle.flush()
+    return handle
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -174,4 +204,5 @@ def main():
 
 
 if __name__ == "__main__":
+    options_terminal_lock_handle = acquire_options_terminal_lock()
     main()
