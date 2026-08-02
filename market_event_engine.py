@@ -56,6 +56,62 @@ EVENT_RULES = {
         "RULE_SUPERTREND_BEARISH",
         "SUPERTREND_BEARISH_SHIFT",
     ),
+    ("PREMIUM_BEHAVIOUR", "PREMIUM_REGIME", "UP"): (
+        "RULE_PREMIUM_EXPANSION_REGIME",
+        "PREMIUM_EXPANSION_REGIME",
+    ),
+    ("PREMIUM_BEHAVIOUR", "PREMIUM_REGIME", "DOWN"): (
+        "RULE_PREMIUM_COMPRESSION_REGIME",
+        "PREMIUM_COMPRESSION_REGIME",
+    ),
+    ("PREMIUM_BEHAVIOUR", "THETA", "DOWN"): (
+        "RULE_THETA_DECAY_ACTIVE",
+        "THETA_DECAY_ACTIVE",
+    ),
+    ("PREMIUM_BEHAVIOUR", "THETA", "NEUTRAL"): (
+        "RULE_THETA_STATE_CHANGE",
+        "THETA_STATE_CHANGE",
+    ),
+    ("PREMIUM_BEHAVIOUR", "GAMMA", "UP"): (
+        "RULE_GAMMA_PRESSURE_BUILDING",
+        "GAMMA_PRESSURE_BUILDING",
+    ),
+    ("PREMIUM_BEHAVIOUR", "GAMMA", "NEUTRAL"): (
+        "RULE_GAMMA_STATE_CHANGE",
+        "GAMMA_STATE_CHANGE",
+    ),
+    ("PREMIUM_BEHAVIOUR", "ROTATION", "UP"): (
+        "RULE_ATM_ROTATION_UP",
+        "ATM_ROTATION_UP",
+    ),
+    ("PREMIUM_BEHAVIOUR", "ROTATION", "DOWN"): (
+        "RULE_ATM_ROTATION_DOWN",
+        "ATM_ROTATION_DOWN",
+    ),
+    ("PREMIUM_BEHAVIOUR", "ROTATION", "NEUTRAL"): (
+        "RULE_ATM_ROTATION_STATE_CHANGE",
+        "ATM_ROTATION_STATE_CHANGE",
+    ),
+    ("PREMIUM_BEHAVIOUR", "MIGRATION", "UP"): (
+        "RULE_PREMIUM_MIGRATION_RIGHT",
+        "PREMIUM_MIGRATION_RIGHT",
+    ),
+    ("PREMIUM_BEHAVIOUR", "MIGRATION", "DOWN"): (
+        "RULE_PREMIUM_MIGRATION_LEFT",
+        "PREMIUM_MIGRATION_LEFT",
+    ),
+    ("PREMIUM_BEHAVIOUR", "MIGRATION", "NEUTRAL"): (
+        "RULE_PREMIUM_MIGRATION_CENTRED",
+        "PREMIUM_MIGRATION_CENTRED",
+    ),
+    ("PREMIUM_BEHAVIOUR", "TIME_PASS", "DOWN"): (
+        "RULE_TIME_PASS_ACTIVE",
+        "TIME_PASS_ACTIVE",
+    ),
+    ("PREMIUM_BEHAVIOUR", "TIME_PASS", "NEUTRAL"): (
+        "RULE_TIME_PASS_STATE_CHANGE",
+        "TIME_PASS_STATE_CHANGE",
+    ),
 }
 
 
@@ -128,6 +184,25 @@ def _severity(
 
     if source == "PREMIUM_FLOW":
         return "IMPORTANT"
+
+    if source == "PREMIUM_BEHAVIOUR":
+        if location == "PREMIUM_REGIME":
+            return "URGENT"
+
+        if location == "GAMMA":
+            return "IMPORTANT"
+
+        if location in {
+            "ROTATION",
+            "MIGRATION",
+        }:
+            return "IMPORTANT"
+
+        if location in {
+            "THETA",
+            "TIME_PASS",
+        }:
+            return "WATCH"
 
     if location == "SUPERTREND":
         return "IMPORTANT"
