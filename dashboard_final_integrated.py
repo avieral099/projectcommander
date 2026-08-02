@@ -939,6 +939,28 @@ def render_commander_intelligence(
     )
 
 
+
+def render_market_narrative(adapter):
+    narrative = adapter.market_narrative
+
+    print("\n" + "=" * WIDTH)
+    print("COMMANDER MARKET NARRATIVE".center(WIDTH))
+    print("=" * WIDTH)
+
+    print_key_value("STATUS", narrative.get("status"))
+    print_key_value("HEADLINE", narrative.get("headline"))
+    print_key_value("SUMMARY", narrative.get("summary"))
+    print_key_value("BIAS", narrative.get("bias"))
+    print_key_value(
+        "CONFIDENCE",
+        f"{narrative.get('confidence')} ({narrative.get('confidence_label')})"
+    )
+    print_key_value("RISK", narrative.get("risk"))
+    print_key_value("NEXT FOCUS", narrative.get("next_focus"))
+
+    print("=" * WIDTH)
+
+
 def render_commander_footer(verdict_status, final_order):
     print("\n" + "=" * WIDTH)
     print("COMMANDER SUMMARY".center(WIDTH))
@@ -1495,6 +1517,11 @@ def main():
     render_commander_intelligence(
         state_adapter
     )
+
+    render_market_narrative(
+        state_adapter
+    )
+
 
     render_commander_footer(
         verdict_status,

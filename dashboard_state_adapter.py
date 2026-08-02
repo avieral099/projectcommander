@@ -146,6 +146,32 @@ class DashboardStateAdapter:
         ]
 
     @property
+    def market_narrative(self) -> dict[str, Any]:
+        narrative = _dict(
+            self.state.get("market_narrative")
+        )
+
+        if narrative:
+            return narrative
+
+        return {
+            "status": "UNAVAILABLE",
+            "headline": "Market narrative unavailable",
+            "summary": (
+                "Commander market narrative state "
+                "is unavailable."
+            ),
+            "bias": "NEUTRAL",
+            "confidence": 0,
+            "confidence_label": "LOW",
+            "risk": "UNKNOWN",
+            "next_focus": (
+                "Continue monitoring Commander state."
+            ),
+            "supporting_event_names": [],
+        }
+
+    @property
     def intelligence_packet(self) -> dict[str, Any]:
         packet = _dict(
             self.state.get("intelligence_packet")
@@ -185,4 +211,5 @@ class DashboardStateAdapter:
             "event_queue_summary": self.event_queue_summary,
             "actionable_events": self.actionable_events,
             "intelligence_packet": self.intelligence_packet,
+            "market_narrative": self.market_narrative,
         }
