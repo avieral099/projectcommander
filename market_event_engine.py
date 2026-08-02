@@ -23,6 +23,88 @@ EVENT_PRIORITY = {
 }
 
 
+EVENT_RULES = {
+    ("STRADDLE", "ATM_STRADDLE", "UP"): (
+        "RULE_STRADDLE_EXPANSION",
+        "ATM_STRADDLE_EXPANSION",
+    ),
+    ("STRADDLE", "ATM_STRADDLE", "DOWN"): (
+        "RULE_STRADDLE_CONTRACTION",
+        "ATM_STRADDLE_CONTRACTION",
+    ),
+    ("PREMIUM_FLOW", "PREMIUM_FLOW", "CALL"): (
+        "RULE_CALL_PARTICIPATION",
+        "CALL_PREMIUM_PARTICIPATION",
+    ),
+    ("PREMIUM_FLOW", "PREMIUM_FLOW", "PUT"): (
+        "RULE_PUT_PARTICIPATION",
+        "PUT_PREMIUM_PARTICIPATION",
+    ),
+    ("MARKET_STRUCTURE", "VWAP", "UP"): (
+        "RULE_VWAP_RECLAIM",
+        "VWAP_RECLAIM",
+    ),
+    ("MARKET_STRUCTURE", "VWAP", "DOWN"): (
+        "RULE_VWAP_LOSS",
+        "VWAP_LOSS",
+    ),
+    ("MARKET_STRUCTURE", "SUPERTREND", "UP"): (
+        "RULE_SUPERTREND_BULLISH",
+        "SUPERTREND_BULLISH_SHIFT",
+    ),
+    ("MARKET_STRUCTURE", "SUPERTREND", "DOWN"): (
+        "RULE_SUPERTREND_BEARISH",
+        "SUPERTREND_BEARISH_SHIFT",
+    ),
+}
+
+
+def _rule_identity(
+    *,
+    source: str,
+    location: str,
+    current_direction: str,
+    current_detail: str,
+) -> tuple[str, str]:
+    source_key = _text(source).upper()
+    location_key = _text(location).upper()
+    direction_key = _text(
+        current_direction,
+        "NEUTRAL",
+    ).upper()
+
+    direct = EVENT_RULES.get(
+        (
+            source_key,
+            location_key,
+            direction_key,
+        )
+    )
+
+    if direct:
+        return direct
+
+    if source_key == "STRADDLE_STRUCTURE":
+        detail_key = _text(
+            current_detail,
+            "UNKNOWN",
+        ).upper()
+
+        return (
+            "RULE_STRADDLE_STRUCTURE",
+            f"STRADDLE_STRUCTURE_{detail_key}",
+        )
+
+    return (
+        "RULE_GENERIC_STATE_CHANGE",
+        (
+            f"{source_key}_"
+            f"{location_key}_"
+            f"{direction_key}"
+        ),
+    )
+
+
 def _severity(
     *,
     source: str,
@@ -105,6 +187,8 @@ class MarketEventEngine:
                 current_direction TEXT NOT NULL,
 
                 event_type TEXT NOT NULL,
+                rule_id TEXT NOT NULL DEFAULT 'RULE_UNKNOWN',
+                event_name TEXT NOT NULL DEFAULT 'UNKNOWN_EVENT',
                 previous_value REAL NOT NULL DEFAULT 0.0,
                 current_value REAL NOT NULL DEFAULT 0.0,
                 value_change REAL NOT NULL DEFAULT 0.0,
@@ -140,6 +224,8 @@ class MarketEventEngine:
         }
 
         migrations = {
+            "rule_id": "TEXT NOT NULL DEFAULT 'RULE_UNKNOWN'",
+            "event_name": "TEXT NOT NULL DEFAULT 'UNKNOWN_EVENT'",
             "previous_value": "REAL NOT NULL DEFAULT 0.0",
             "current_value": "REAL NOT NULL DEFAULT 0.0",
             "value_change": "REAL NOT NULL DEFAULT 0.0",
@@ -235,6 +321,16 @@ class MarketEventEngine:
             )
             unit = _text(current.get("unit"), "")
 
+            rule_id, event_name = _rule_identity(
+                source=current["source"],
+                location=current["location"],
+                current_direction=current_direction,
+                current_detail=_text(
+                    current.get("detail"),
+                    "",
+                ),
+            )
+
             display_text = (
                 f"{current['location']}: "
                 f"{previous_title} → {current_title}"
@@ -258,6 +354,8 @@ class MarketEventEngine:
                 "previous_direction": previous_direction,
                 "current_direction": current_direction,
                 "event_type": event_type,
+                "rule_id": rule_id,
+                "event_name": event_name,
                 "previous_value": round(previous_value, 2),
                 "current_value": round(current_value, 2),
                 "value_change": round(value_change, 2),
@@ -293,6 +391,8 @@ class MarketEventEngine:
                     previous_direction,
                     current_direction,
                     event_type,
+                    rule_id,
+                    event_name,
                     previous_value,
                     current_value,
                     value_change,
@@ -313,6 +413,8 @@ class MarketEventEngine:
                     :previous_direction,
                     :current_direction,
                     :event_type,
+                    :rule_id,
+                    :event_name,
                     :previous_value,
                     :current_value,
                     :value_change,
