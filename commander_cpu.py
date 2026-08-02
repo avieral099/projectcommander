@@ -7,6 +7,7 @@ import dashboard
 from cockpit_config import CASH_WATCHLIST,CPU_LOG_FILE,INDEX_WATCHLIST,STATE_FILE
 from commander_state_store import context_to_dict,serialise,write_state
 from live_cache import refresh_live_cache
+from event_queue import EventQueue
 IST=ZoneInfo("Asia/Kolkata"); MARKET_OPEN=clock_time(9,15); MARKET_CLOSE=clock_time(15,30)
 def now():return datetime.now(IST)
 def collect_watchlist():
@@ -16,7 +17,14 @@ def cycle():
     log=Path(CPU_LOG_FILE)
     with log.open("a") as fh,contextlib.redirect_stdout(fh),contextlib.redirect_stderr(fh): state=dashboard.main()
     if not isinstance(state,dict):raise RuntimeError("Run install_cockpit_v1.py first")
-    payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist()}
+    with EventQueue("premium_intelligence_1m.db") as event_queue:
+        event_queue_summary = event_queue.summary()
+        actionable_events = event_queue.latest_actionable(
+            limit=20,
+            minimum_priority=2,
+        )
+
+    payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist(),"event_queue_summary":serialise(event_queue_summary),"actionable_events":serialise(actionable_events)}
     payload["timestamp"]=payload.get("generated_at") or now().isoformat()
     payload["updated_at"]=now().isoformat()
     payload["age_seconds"]=0
