@@ -8,6 +8,7 @@ from cockpit_config import CASH_WATCHLIST,CPU_LOG_FILE,INDEX_WATCHLIST,STATE_FIL
 from commander_state_store import context_to_dict,serialise,write_state
 from live_cache import refresh_live_cache
 from event_queue import EventQueue
+from commander_intelligence_engine import build_intelligence_packet
 IST=ZoneInfo("Asia/Kolkata"); MARKET_OPEN=clock_time(9,15); MARKET_CLOSE=clock_time(15,30)
 
 COMMANDER_CPU_LOCK = Path(".commander_cpu.lock")
@@ -49,7 +50,11 @@ def cycle():
             minimum_priority=2,
         )
 
-    payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist(),"event_queue_summary":serialise(event_queue_summary),"actionable_events":serialise(actionable_events)}
+    intelligence_packet = build_intelligence_packet(
+        actionable_events
+    )
+
+    payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist(),"event_queue_summary":serialise(event_queue_summary),"actionable_events":serialise(actionable_events),"intelligence_packet":serialise(intelligence_packet)}
     payload["timestamp"]=payload.get("generated_at") or now().isoformat()
     payload["updated_at"]=now().isoformat()
     payload["age_seconds"]=0
