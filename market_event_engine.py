@@ -12,6 +12,53 @@ def _text(value: Any, default: str = "UNKNOWN") -> str:
     return str(value if value is not None else default).strip()
 
 
+
+
+EVENT_PRIORITY = {
+    "CRITICAL": 5,
+    "URGENT": 4,
+    "IMPORTANT": 3,
+    "WATCH": 2,
+    "INFO": 1,
+}
+
+
+def _severity(
+    *,
+    source: str,
+    location: str,
+    event_type: str,
+    value_change_pct: float,
+) -> str:
+    source = _text(source).upper()
+    location = _text(location).upper()
+    event_type = _text(event_type).upper()
+    magnitude = abs(float(value_change_pct or 0.0))
+
+    if location == "ATM_STRADDLE":
+        if magnitude >= 20.0:
+            return "CRITICAL"
+        if magnitude >= 10.0:
+            return "URGENT"
+        if magnitude >= 5.0:
+            return "IMPORTANT"
+        return "WATCH"
+
+    if source == "PREMIUM_FLOW":
+        return "IMPORTANT"
+
+    if location == "SUPERTREND":
+        return "IMPORTANT"
+
+    if location == "VWAP":
+        return "WATCH"
+
+    if event_type == "DIRECTION_CHANGED":
+        return "WATCH"
+
+    return "INFO"
+
+
 class MarketEventEngine:
     """
     Convert repeated observations into state-change events.
@@ -58,7 +105,14 @@ class MarketEventEngine:
                 current_direction TEXT NOT NULL,
 
                 event_type TEXT NOT NULL,
+                previous_value REAL NOT NULL DEFAULT 0.0,
+                current_value REAL NOT NULL DEFAULT 0.0,
+                value_change REAL NOT NULL DEFAULT 0.0,
+                value_change_pct REAL NOT NULL DEFAULT 0.0,
+                unit TEXT NOT NULL DEFAULT '',
                 display_text TEXT NOT NULL,
+                severity TEXT NOT NULL DEFAULT 'INFO',
+                priority_score INTEGER NOT NULL DEFAULT 1,
                 status TEXT NOT NULL,
 
                 UNIQUE(
@@ -78,6 +132,30 @@ class MarketEventEngine:
             );
             """
         )
+        columns = {
+            row["name"]
+            for row in self.connection.execute(
+                "PRAGMA table_info(market_events)"
+            )
+        }
+
+        migrations = {
+            "previous_value": "REAL NOT NULL DEFAULT 0.0",
+            "current_value": "REAL NOT NULL DEFAULT 0.0",
+            "value_change": "REAL NOT NULL DEFAULT 0.0",
+            "value_change_pct": "REAL NOT NULL DEFAULT 0.0",
+            "unit": "TEXT NOT NULL DEFAULT ''",
+            "severity": "TEXT NOT NULL DEFAULT 'INFO'",
+            "priority_score": "INTEGER NOT NULL DEFAULT 1",
+        }
+
+        for column, definition in migrations.items():
+            if column not in columns:
+                self.connection.execute(
+                    f"ALTER TABLE market_events "
+                    f"ADD COLUMN {column} {definition}"
+                )
+
         self.connection.commit()
 
     def _previous_observation(
@@ -147,9 +225,26 @@ class MarketEventEngine:
             else:
                 event_type = "STATE_CHANGED"
 
+            previous_value = float(previous.get("value") or 0.0)
+            current_value = float(current.get("value") or 0.0)
+            value_change = current_value - previous_value
+            value_change_pct = (
+                (value_change / previous_value) * 100.0
+                if previous_value != 0
+                else 0.0
+            )
+            unit = _text(current.get("unit"), "")
+
             display_text = (
                 f"{current['location']}: "
                 f"{previous_title} → {current_title}"
+            )
+
+            severity = _severity(
+                source=current["source"],
+                location=current["location"],
+                event_type=event_type,
+                value_change_pct=value_change_pct,
             )
 
             event = {
@@ -163,7 +258,14 @@ class MarketEventEngine:
                 "previous_direction": previous_direction,
                 "current_direction": current_direction,
                 "event_type": event_type,
+                "previous_value": round(previous_value, 2),
+                "current_value": round(current_value, 2),
+                "value_change": round(value_change, 2),
+                "value_change_pct": round(value_change_pct, 2),
+                "unit": unit,
                 "display_text": display_text,
+                "severity": severity,
+                "priority_score": EVENT_PRIORITY[severity],
                 "status": "NEW",
             }
 
@@ -191,7 +293,14 @@ class MarketEventEngine:
                     previous_direction,
                     current_direction,
                     event_type,
+                    previous_value,
+                    current_value,
+                    value_change,
+                    value_change_pct,
+                    unit,
                     display_text,
+                    severity,
+                    priority_score,
                     status
                 ) VALUES (
                     :timestamp,
@@ -204,7 +313,14 @@ class MarketEventEngine:
                     :previous_direction,
                     :current_direction,
                     :event_type,
+                    :previous_value,
+                    :current_value,
+                    :value_change,
+                    :value_change_pct,
+                    :unit,
                     :display_text,
+                    :severity,
+                    :priority_score,
                     :status
                 )
                 """,
