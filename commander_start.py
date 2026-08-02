@@ -10,6 +10,7 @@ SERVICES = {
         "pattern": "commander_cpu.py",
         "command": [
             "python3",
+            "-u",
             "commander_cpu.py",
             "--allow-closed",
         ],
