@@ -17,6 +17,8 @@ from commander_terminal import (
 from trade_lifecycle_panel import (
     print_trade_lifecycle,
 )
+from dashboard_state_adapter import DashboardStateAdapter
+
 from driver_engine import (
     DRIVER_SYMBOLS,
     collect_driver_data,
@@ -825,6 +827,118 @@ def render_commander_header(now, phase):
     print_key_value("09:25 STRADDLE", "ENGINE CONTROLLED")
 
 
+def render_commander_intelligence(
+    adapter: DashboardStateAdapter,
+) -> None:
+    packet = adapter.intelligence_packet
+
+    print("\n" + "=" * WIDTH)
+    print(
+        "COMMANDER INTELLIGENCE".center(
+            WIDTH
+        )
+    )
+    print("=" * WIDTH)
+
+    if not adapter.available:
+        print_key_value(
+            "STATE",
+            "COMMANDER STATE UNAVAILABLE",
+        )
+        return
+
+    if not adapter.is_fresh():
+        age = adapter.age_seconds
+        age_text = (
+            f"{age:.0f}s"
+            if age is not None
+            else "UNKNOWN"
+        )
+
+        print_key_value(
+            "STATE",
+            f"STALE — AGE {age_text}",
+        )
+        return
+
+    print_key_value(
+        "STATUS",
+        packet.get(
+            "status",
+            "UNKNOWN",
+        ),
+    )
+
+    print_key_value(
+        "DIRECTION",
+        packet.get(
+            "dominant_direction",
+            "NEUTRAL",
+        ),
+    )
+
+    print_key_value(
+        "CONFIDENCE",
+        (
+            f"{safe_float(packet.get('confidence')):.0f}%"
+        ),
+    )
+
+    print_key_value(
+        "RISK",
+        packet.get(
+            "risk",
+            "UNKNOWN",
+        ),
+    )
+
+    print_key_value(
+        "SEVERITY",
+        packet.get(
+            "highest_severity",
+            "INFO",
+        ),
+    )
+
+    print_key_value(
+        "EVENTS",
+        int(
+            safe_float(
+                packet.get(
+                    "event_count"
+                )
+            )
+        ),
+    )
+
+    print_key_value(
+        "MARKET STORY",
+        packet.get(
+            "market_story",
+            "No actionable market intelligence.",
+        ),
+    )
+
+    supporting_ids = (
+        packet.get(
+            "supporting_event_ids"
+        )
+        or []
+    )
+
+    print_key_value(
+        "SUPPORTING EVENT IDS",
+        (
+            ", ".join(
+                str(event_id)
+                for event_id in supporting_ids
+            )
+            if supporting_ids
+            else "NONE"
+        ),
+    )
+
+
 def render_commander_footer(verdict_status, final_order):
     print("\n" + "=" * WIDTH)
     print("COMMANDER SUMMARY".center(WIDTH))
@@ -1050,6 +1164,9 @@ def render_pipeline_overview(contexts):
 def main():
     import io
     from contextlib import redirect_stdout
+
+    state_adapter = DashboardStateAdapter()
+    state_adapter.refresh()
 
     now = datetime.now(IST)
     _, phase = get_session_phase()
@@ -1373,6 +1490,10 @@ def main():
 
     print_system_health(
         system_statuses
+    )
+
+    render_commander_intelligence(
+        state_adapter
     )
 
     render_commander_footer(
