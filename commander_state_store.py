@@ -14,7 +14,7 @@ def serialise(value: Any) -> Any:
     if hasattr(value,"__dict__"): return serialise(vars(value))
     return str(value)
 def context_to_dict(context: Any) -> dict[str,Any]:
-    fields=("symbol","snapshot","recorder_result","behaviour","flow","structure","battle","evidence","decision","lifecycle","errors")
+    fields=("symbol","snapshot","recorder_result","behaviour","flow","structure","battle","evidence","observations","events","decision","lifecycle","validation","errors")
     return {name:serialise(getattr(context,name,None)) for name in fields} if context else {}
 def write_state(path,payload):
     target=Path(path); temp=target.with_suffix(target.suffix+".tmp"); payload=dict(payload); payload["state_written_at"]=datetime.now(IST).isoformat(); temp.write_text(json.dumps(serialise(payload),indent=2)); temp.replace(target)

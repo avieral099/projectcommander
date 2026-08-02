@@ -17,6 +17,9 @@ from premium_intelligence_1m import (
 from straddle_structure_engine import StraddleStructureEngine
 from trade_lifecycle_engine import TradeLifecycleEngine
 from validation_engine import ValidationEngine
+from market_observation_engine import observe
+from observation_store import ObservationStore
+from market_event_engine import MarketEventEngine
 
 
 DEFAULT_DB_PATH = "premium_intelligence_1m.db"
@@ -506,6 +509,36 @@ def run_pipeline(
             error,
         )
 
+
+    try:
+        context.observations = observe(
+            context,
+            market_snapshot=market_snapshot,
+        )
+
+        with ObservationStore(db_path) as observation_store:
+            saved_observations = observation_store.save_many(
+                context.observations
+            )
+
+        with MarketEventEngine(db_path) as event_engine:
+            context.events = event_engine.process(
+                context.observations
+            )
+
+        if isinstance(context.recorder_result, dict):
+            context.recorder_result[
+                "observations_saved"
+            ] = saved_observations
+            context.recorder_result[
+                "events_detected"
+            ] = len(context.events)
+
+    except Exception as error:
+        context.set_error(
+            "market_observation_engine",
+            error,
+        )
 
     try:
         context.decision = generate_decision(
