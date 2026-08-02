@@ -146,6 +146,12 @@ class DashboardStateAdapter:
         ]
 
     @property
+    def premium_behaviour(self) -> dict[str, Any]:
+        return _dict(
+            self.state.get("premium_behaviour")
+        )
+
+    @property
     def market_narrative(self) -> dict[str, Any]:
         narrative = _dict(
             self.state.get("market_narrative")
@@ -212,4 +218,5 @@ class DashboardStateAdapter:
             "actionable_events": self.actionable_events,
             "intelligence_packet": self.intelligence_packet,
             "market_narrative": self.market_narrative,
+            "premium_behaviour": self.premium_behaviour,
         }

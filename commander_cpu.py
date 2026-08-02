@@ -10,6 +10,7 @@ from live_cache import refresh_live_cache
 from event_queue import EventQueue
 from commander_intelligence_engine import build_intelligence_packet
 from commander_market_narrative import build_market_narrative
+from premium_behaviour_engine import PremiumBehaviourEngineV3
 IST=ZoneInfo("Asia/Kolkata"); MARKET_OPEN=clock_time(9,15); MARKET_CLOSE=clock_time(15,30)
 
 COMMANDER_CPU_LOCK = Path(".commander_cpu.lock")
@@ -59,7 +60,36 @@ def cycle():
         intelligence_packet
     )
 
-    payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist(),"event_queue_summary":serialise(event_queue_summary),"actionable_events":serialise(actionable_events),"intelligence_packet":serialise(intelligence_packet),"market_narrative":serialise(market_narrative)}
+    premium_behaviour = {}
+
+    try:
+        with PremiumBehaviourEngineV3(
+            "premium_intelligence_1m.db"
+        ) as behaviour_engine:
+            for symbol in state.get(
+                "premium_snapshots",
+                {},
+            ):
+                try:
+                    report = behaviour_engine.analyse(
+                        symbol
+                    )
+                except Exception as error:
+                    premium_behaviour[symbol] = {
+                        "status": "UNAVAILABLE",
+                        "error": str(error),
+                    }
+                else:
+                    premium_behaviour[symbol] = (
+                        report.to_dict()
+                    )
+    except Exception as error:
+        premium_behaviour = {
+            "_status": "UNAVAILABLE",
+            "_error": str(error),
+        }
+
+    payload={"generated_at":state.get("generated_at"),"phase":state.get("phase"),"market_snapshots":serialise(state.get("market_snapshots",{})),"premium_snapshots":serialise(state.get("premium_snapshots",{})),"drivers":serialise(state.get("drivers",{})),"contexts":{k:context_to_dict(v) for k,v in state.get("commander_contexts",{}).items()},"system_statuses":serialise(state.get("system_statuses",{})),"watchlist":collect_watchlist(),"event_queue_summary":serialise(event_queue_summary),"actionable_events":serialise(actionable_events),"intelligence_packet":serialise(intelligence_packet),"market_narrative":serialise(market_narrative),"premium_behaviour":serialise(premium_behaviour)}
     payload["timestamp"]=payload.get("generated_at") or now().isoformat()
     payload["updated_at"]=now().isoformat()
     payload["age_seconds"]=0

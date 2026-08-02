@@ -940,6 +940,115 @@ def render_commander_intelligence(
 
 
 
+def render_premium_behaviour(
+    adapter: DashboardStateAdapter,
+) -> None:
+    reports = adapter.premium_behaviour
+
+    print("\n" + "=" * WIDTH)
+    print(
+        "PREMIUM BEHAVIOUR INTELLIGENCE".center(
+            WIDTH
+        )
+    )
+    print("=" * WIDTH)
+
+    if not reports:
+        print_key_value(
+            "STATUS",
+            "PREMIUM BEHAVIOUR UNAVAILABLE",
+        )
+        return
+
+    symbols = [
+        "NSE:NIFTY50-INDEX",
+        "NSE:NIFTYBANK-INDEX",
+        "BSE:SENSEX-INDEX",
+    ]
+
+    labels = {
+        "NSE:NIFTY50-INDEX": "NIFTY",
+        "NSE:NIFTYBANK-INDEX": "BANKNIFTY",
+        "BSE:SENSEX-INDEX": "SENSEX",
+    }
+
+    for symbol in symbols:
+        report = reports.get(symbol) or {}
+        label = labels[symbol]
+
+        print("-" * WIDTH)
+        print(label.center(WIDTH))
+        print("-" * WIDTH)
+
+        if report.get("status") == "UNAVAILABLE":
+            print_key_value(
+                "STATUS",
+                report.get(
+                    "error",
+                    "UNAVAILABLE",
+                ),
+            )
+            continue
+
+        metrics = report.get("metrics") or {}
+
+        print_key_value(
+            "ATM STRADDLE",
+            (
+                f"₹{safe_float(metrics.get('atm_straddle')):.2f}"
+            ),
+        )
+        print_key_value(
+            "REGIME",
+            report.get(
+                "regime",
+                "UNKNOWN",
+            ),
+        )
+        print_key_value(
+            "THETA",
+            (
+                f"{report.get('theta_state', 'UNKNOWN')} "
+                f"[{safe_float(report.get('theta_score')):.2f}]"
+            ),
+        )
+        print_key_value(
+            "GAMMA",
+            (
+                f"{report.get('gamma_state', 'UNKNOWN')} "
+                f"[{safe_float(report.get('gamma_score')):.2f}]"
+            ),
+        )
+        print_key_value(
+            "ROTATION",
+            (
+                f"{report.get('rotation_state', 'UNKNOWN')} "
+                f"[{int(safe_float(report.get('rotation_count')))}]"
+            ),
+        )
+        print_key_value(
+            "MIGRATION",
+            report.get(
+                "migration_state",
+                "UNKNOWN",
+            ),
+        )
+        print_key_value(
+            "TIME PASS",
+            (
+                f"{report.get('time_pass_state', 'UNKNOWN')} "
+                f"[{safe_float(report.get('time_pass_index')):.2f}%]"
+            ),
+        )
+        print_key_value(
+            "COMMANDER VIEW",
+            report.get(
+                "commander_view",
+                "UNKNOWN",
+            ),
+        )
+
+
 def render_market_narrative(adapter):
     narrative = adapter.market_narrative
 
@@ -1515,6 +1624,10 @@ def main():
     )
 
     render_commander_intelligence(
+        state_adapter
+    )
+
+    render_premium_behaviour(
         state_adapter
     )
 

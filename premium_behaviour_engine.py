@@ -128,8 +128,41 @@ class PremiumBehaviourEngineV3:
         rotation_score = clamp(rc*20 + abs(shift)/5)
         rotation_state = "NONE" if rc==0 else ("AGGRESSIVE_UP" if rotation_score>=75 and shift>0 else "AGGRESSIVE_DOWN" if rotation_score>=75 else "MODERATE_UP" if shift>0 else "MODERATE_DOWN")
 
-        migration_state = "RIGHT_AGGRESSIVE" if leader_step>=2 else "RIGHT" if leader_step==1 else "LEFT_AGGRESSIVE" if leader_step<=-2 else "LEFT" if leader_step==-1 else "ATM_CENTRED"
-        migration_score = clamp(abs(leader_step)*20 + max(leader_change,0)*10)
+        zero_movement = (
+            abs(one) < 0.0001
+            and abs(from_open) < 0.0001
+            and abs(vs21) < 0.0001
+            and abs(vs25) < 0.0001
+            and rc == 0
+            and all(
+                abs(change) < 0.0001
+                for change in recent_changes
+            )
+        )
+
+        if zero_movement:
+            migration_state = "ATM_CENTRED"
+            migration_score = 0.0
+            leader_strike = si(
+                latest.get("atm_strike")
+            )
+            leader_change = 0.0
+        else:
+            migration_state = (
+                "RIGHT_AGGRESSIVE"
+                if leader_step >= 2
+                else "RIGHT"
+                if leader_step == 1
+                else "LEFT_AGGRESSIVE"
+                if leader_step <= -2
+                else "LEFT"
+                if leader_step == -1
+                else "ATM_CENTRED"
+            )
+            migration_score = clamp(
+                abs(leader_step) * 20
+                + max(leader_change, 0) * 10
+            )
 
         # Time pass
         tpi = 100 - min(abs(from_open)*4,35) - min(abs(one)*12,30) - min(rotation_score*.35,25) - min(gamma_score*.25,25)
