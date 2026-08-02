@@ -223,7 +223,7 @@ def observe(
                 timestamp=timestamp,
                 symbol=symbol,
                 source="PREMIUM_FLOW",
-                location=dominant_side,
+                location="PREMIUM_FLOW",
                 title=(
                     f"{dominant_side} premiums "
                     f"show stronger participation"
