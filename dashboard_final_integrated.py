@@ -912,6 +912,34 @@ def render_commander_intelligence(
     )
 
     print_key_value(
+        "PREMIUM EVENTS",
+        int(
+            safe_float(
+                packet.get(
+                    "premium_behaviour_event_count"
+                )
+            )
+        ),
+    )
+
+    premium_weight = int(
+        safe_float(
+            packet.get(
+                "premium_behaviour_weight"
+            )
+        )
+    )
+
+    print_key_value(
+        "PREMIUM WEIGHT",
+        (
+            f"{premium_weight:+d}"
+            if premium_weight
+            else "0"
+        ),
+    )
+
+    print_key_value(
         "MARKET STORY",
         packet.get(
             "market_story",

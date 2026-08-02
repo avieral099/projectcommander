@@ -4,6 +4,19 @@ from collections import Counter
 from typing import Any, Iterable
 
 
+PREMIUM_EVENT_WEIGHTS = {
+    "PREMIUM_EXPANSION_REGIME": 20,
+    "GAMMA_PRESSURE_BUILDING": 18,
+    "ATM_ROTATION_UP": 14,
+    "ATM_ROTATION_DOWN": 14,
+    "PREMIUM_MIGRATION_RIGHT": 10,
+    "PREMIUM_MIGRATION_LEFT": 10,
+    "THETA_DECAY_ACTIVE": -12,
+    "TIME_PASS_ACTIVE": -15,
+    "PREMIUM_COMPRESSION_REGIME": -18,
+}
+
+
 def _text(value: Any, default: str = "UNKNOWN") -> str:
     return str(value if value is not None else default).strip()
 
@@ -22,6 +35,24 @@ def _severity(event: dict[str, Any]) -> str:
     ).upper()
 
 
+def _event_name(
+    event: dict[str, Any],
+) -> str:
+    return _text(
+        event.get("event_name"),
+        "UNKNOWN_EVENT",
+    ).upper()
+
+
+def _premium_weight(
+    event: dict[str, Any],
+) -> int:
+    return PREMIUM_EVENT_WEIGHTS.get(
+        _event_name(event),
+        0,
+    )
+
+
 def _priority(event: dict[str, Any]) -> int:
     try:
         return int(event.get("priority_score") or 0)
@@ -36,6 +67,21 @@ def _confidence(events: list[dict[str, Any]]) -> int:
     priority_component = min(
         sum(_priority(event) for event in events) * 8,
         50,
+    )
+
+    premium_component = sum(
+        _premium_weight(event)
+        for event in events
+    )
+
+    positive_premium_component = min(
+        max(premium_component, 0),
+        25,
+    )
+
+    negative_premium_component = min(
+        abs(min(premium_component, 0)),
+        25,
     )
 
     directions = [
@@ -55,11 +101,16 @@ def _confidence(events: list[dict[str, Any]]) -> int:
 
     breadth_component = min(len(events) * 5, 20)
 
-    return min(
-        priority_component
-        + agreement_component
-        + breadth_component,
-        100,
+    return max(
+        0,
+        min(
+            priority_component
+            + agreement_component
+            + breadth_component
+            + positive_premium_component
+            - negative_premium_component,
+            100,
+        ),
     )
 
 
@@ -93,10 +144,39 @@ def _market_story(
         for event in events
     }
 
+    event_names = {
+        _event_name(event)
+        for event in events
+    }
+
     has_straddle = "ATM_STRADDLE" in locations
     has_flow = "PREMIUM_FLOW" in locations
     has_vwap = "VWAP" in locations
     has_supertrend = "SUPERTREND" in locations
+
+    if "PREMIUM_EXPANSION_REGIME" in event_names:
+        if "GAMMA_PRESSURE_BUILDING" in event_names:
+            return (
+                "Combined ATM straddle premium is expanding "
+                "with gamma pressure building."
+            )
+
+        return (
+            "Combined ATM straddle premium has entered "
+            "an expansion regime."
+        )
+
+    if "PREMIUM_COMPRESSION_REGIME" in event_names:
+        return (
+            "Combined ATM straddle premium is compressing "
+            "and movement is being absorbed."
+        )
+
+    if "TIME_PASS_ACTIVE" in event_names:
+        return (
+            "Time-pass conditions are active and premium "
+            "is not rewarding directional participation."
+        )
 
     if (
         has_straddle
@@ -211,6 +291,20 @@ def build_intelligence_packet(
         else "INFO"
     )
 
+    premium_weight = sum(
+        _premium_weight(event)
+        for event in ordered
+    )
+
+    premium_event_count = sum(
+        1
+        for event in ordered
+        if _text(
+            event.get("source"),
+            "",
+        ).upper() == "PREMIUM_BEHAVIOUR"
+    )
+
     return {
         "status": (
             "ACTIONABLE"
@@ -223,6 +317,8 @@ def build_intelligence_packet(
         "risk": risk,
         "highest_priority": highest_priority,
         "highest_severity": highest_severity,
+        "premium_behaviour_weight": premium_weight,
+        "premium_behaviour_event_count": premium_event_count,
         "market_story": _market_story(
             ordered,
             dominant_direction,
